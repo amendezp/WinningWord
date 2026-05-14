@@ -19,6 +19,11 @@ import { shouldAnalyze } from "@/lib/trigger/sentenceTrigger";
 import { shouldRunDocumentPass } from "@/lib/trigger/documentTrigger";
 import { analyzeParagraph, analyzeDocument } from "@/lib/analyze/client";
 import { fnv1a } from "@/lib/util/hash";
+import {
+  SEED_HTML,
+  SEED_PARAGRAPH_SUGGESTIONS,
+  SEED_DOCUMENT_FEEDBACK,
+} from "@/lib/seed";
 
 const HighlightExt = Extension.create({
   name: "wwHighlight",
@@ -40,9 +45,8 @@ function getParagraphTexts(editor: ReturnType<typeof useEditor>): string[] {
   return out;
 }
 
-const SEED = `<h1><em>Be one in a million.</em></h1>
-<p>Write. We flag the flab. We cheer the punch.</p>
-<p>Try pasting this sample: I am currently working for Google and we are in the process of investigating ways to improve Docs. We successfully got the project approved. Brilliant.</p>`;
+// Initial doc + canned suggestions live in lib/seed.ts so they're easy to
+// update without touching this file.
 
 export function Editor() {
   const upsertParagraph = useSuggestionsStore((s) => s.upsertParagraph);
@@ -81,7 +85,7 @@ export function Editor() {
       }),
       HighlightExt,
     ],
-    content: SEED,
+    content: SEED_HTML,
     immediatelyRender: false,
     editorProps: {
       attributes: {
@@ -147,6 +151,29 @@ export function Editor() {
       }
     };
   }, [setDocumentFeedback, setPendingDocument]);
+
+  // One-time mount-seed: pre-populate suggestions + document feedback from
+  // lib/seed.ts, then mark every initial paragraph as already-analyzed so the
+  // trigger doesn't fire an API call on first load. The instant the user
+  // edits a seeded paragraph, the regular flow takes over.
+  const seededRef = useRef(false);
+  useEffect(() => {
+    if (!editor || seededRef.current) return;
+    seededRef.current = true;
+    const paragraphs = getParagraphTexts(editor);
+    for (let i = 0; i < paragraphs.length; i++) {
+      const text = paragraphs[i];
+      const seeded = SEED_PARAGRAPH_SUGGESTIONS[i];
+      if (seeded) {
+        upsertParagraph(i, fnv1a(text), seeded);
+      }
+      lastAnalyzedTextRef.current.set(i, text);
+      lastAttemptedTextRef.current.set(i, text);
+    }
+    setDocumentFeedback(SEED_DOCUMENT_FEEDBACK);
+    docTriggerRef.current.lastAnalyzedDocText = paragraphs.join("\n\n");
+    docTriggerRef.current.lastDocAnalyzedAt = Date.now();
+  }, [editor, upsertParagraph, setDocumentFeedback]);
 
   // Periodic ticker: check every paragraph's trigger condition and fire if ready.
   useEffect(() => {

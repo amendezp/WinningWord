@@ -1,0 +1,69 @@
+import type { ParagraphFeedback, DocumentFeedback } from "@/lib/analyze/tools";
+
+/**
+ * Initial document content + pre-baked suggestions for the demo.
+ *
+ * Why: every page load used to fire Pass A on the seed text, costing an
+ * API call to produce highlights we can predict deterministically. Seeding
+ * the store on mount gives us:
+ *   - zero API cost on first paint
+ *   - a consistent demo state every time
+ *   - guaranteed highlight on "Brilliant." (the model was too stingy)
+ *
+ * If the user edits a seeded paragraph, the regular trigger flow takes over
+ * and the seed is overwritten with whatever the model returns.
+ */
+export const SEED_HTML = `<h1><em>Be one in a million.</em></h1>
+<p>Type below. After every couple of sentences, WinningWord scans your prose against the Winning Writing rules. Red marks the flab to cut. Yellow nudges you tighter. Green celebrates the punch.</p>
+<p>Try pasting this sample: I am currently working for Google and we are in the process of investigating ways to improve Docs. We successfully got the project approved. Brilliant.</p>`;
+
+/**
+ * Suggestions keyed by paragraph index (top-level textblock order in the doc).
+ * Indices here MUST match the SEED_HTML structure:
+ *   0 → heading
+ *   1 → explainer paragraph
+ *   2 → sample paragraph (the one we actually want to demo on)
+ */
+export const SEED_PARAGRAPH_SUGGESTIONS: Record<number, ParagraphFeedback> = {
+  2: {
+    issues: [
+      {
+        phrase: "currently working",
+        ruleId: "wordiness",
+        rationale: "Drop 'currently' — the present tense already says now.",
+        suggestion: "working",
+      },
+      {
+        phrase: "in the process of investigating",
+        ruleId: "wordiness",
+        rationale: "'In the process of' is filler. Cut to the verb.",
+        suggestion: "investigating",
+      },
+      {
+        phrase: "successfully got the project approved",
+        ruleId: "weak_adverb",
+        rationale: "'Successfully' adds nothing — getting approval IS the success.",
+        suggestion: "got the project approved",
+      },
+    ],
+    improvements: [],
+    praises: [
+      {
+        phrase: "Brilliant.",
+        ruleId: "punchy_brevity",
+        rationale: "Single-word punch. Maximum impact, minimum words. Perfect close.",
+      },
+    ],
+  },
+};
+
+/**
+ * Pre-seeded document-level feedback so the Document tab has content on first
+ * load too. Pass B is skipped at startup; the user can hit "Review now" to
+ * refresh against current state.
+ */
+export const SEED_DOCUMENT_FEEDBACK: DocumentFeedback = {
+  one_sentence_summary:
+    "A demo document showing how WinningWord coaches you on bloat, weak verbs, and punch.",
+  observations: [],
+};

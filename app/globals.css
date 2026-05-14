@@ -91,12 +91,10 @@ html, body {
   background-color: rgba(134, 239, 172, 0.75);
 }
 
-/* Forbidden word — instant client-side highlight, no API call needed.
-   Visually dominates the lighter .ww-issue highlight if both apply. */
+/* Forbidden word — instant client-side flag, no API call.
+   Red letters, slightly bolder. Sits on top of any other highlight by virtue
+   of being a higher-specificity color: text-color isn't fighting a background. */
 .ww-forbidden {
-  background-color: rgba(153, 27, 27, 0.85); /* dark red */
-  color: #fff;
-  border-radius: 2px;
-  padding: 0 2px;
-  font-weight: 500;
+  color: #b91c1c; /* dark red text */
+  font-weight: 600;
 }
