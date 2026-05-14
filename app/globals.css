@@ -66,6 +66,19 @@ html, body {
 .ww-issue.is-focused {
   background-color: rgba(252, 165, 165, 0.75);
 }
+.ww-improve {
+  /* Yellow "could be tighter" tier — softer than issue, more visible than nothing. */
+  background-color: rgba(254, 240, 138, 0.55);
+  border-bottom: 1px dotted rgba(202, 138, 4, 0.55);
+  border-radius: 2px;
+  padding: 0 1px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+.ww-improve.is-focused {
+  background-color: rgba(253, 224, 71, 0.75);
+}
+
 .ww-praise {
   background-color: rgba(187, 247, 208, 0.55); /* soft mint */
   border-bottom: 1px dotted rgba(22, 163, 74, 0.5);
@@ -76,4 +89,14 @@ html, body {
 }
 .ww-praise.is-focused {
   background-color: rgba(134, 239, 172, 0.75);
+}
+
+/* Forbidden word — instant client-side highlight, no API call needed.
+   Visually dominates the lighter .ww-issue highlight if both apply. */
+.ww-forbidden {
+  background-color: rgba(153, 27, 27, 0.85); /* dark red */
+  color: #fff;
+  border-radius: 2px;
+  padding: 0 2px;
+  font-weight: 500;
 }

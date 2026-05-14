@@ -63,6 +63,13 @@
     "expectedAnyOf": ["As a renowned and savvy investor"]
   },
   {
+    "name": "progressive -ing verb",
+    "ruleIds": ["ing_verb"],
+    "scope": "paragraph",
+    "before": "Our team is leading the integration and is preparing the launch plan for next quarter.",
+    "expectedAnyOf": ["is leading", "is preparing"]
+  },
+  {
     "name": "BLUF — buried lede pitch",
     "ruleIds": ["bluf"],
     "scope": "document",

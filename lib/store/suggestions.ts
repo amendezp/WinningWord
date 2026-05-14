@@ -8,7 +8,7 @@ export type ParagraphSuggestion = {
   ruleId: string;
   rationale: string;
   suggestion?: string;
-  kind: "issue" | "praise";
+  kind: "issue" | "improve" | "praise";
   // Stable identifier so React lists can key off it and dismissal stays scoped.
   uid: string;
 };
@@ -88,7 +88,7 @@ export const useSuggestionsStore = create<Store>((set, get) => ({
   upsertParagraph: (paragraphIndex, paragraphHash, fb) => {
     const dismissed = get().dismissedKeys;
 
-    const issueSuggestions: ParagraphSuggestion[] = fb.issues
+    const issueSuggestions: ParagraphSuggestion[] = (fb.issues ?? [])
       .map((i) => ({
         paragraphIndex,
         paragraphHash,
@@ -101,7 +101,20 @@ export const useSuggestionsStore = create<Store>((set, get) => ({
       }))
       .filter((s) => !dismissed.has(dismissKey(s)));
 
-    const praiseSuggestions: ParagraphSuggestion[] = fb.praises
+    const improveSuggestions: ParagraphSuggestion[] = (fb.improvements ?? [])
+      .map((i) => ({
+        paragraphIndex,
+        paragraphHash,
+        phrase: i.phrase,
+        ruleId: i.ruleId,
+        rationale: i.rationale,
+        suggestion: i.suggestion,
+        kind: "improve" as const,
+        uid: makeUid({ paragraphIndex, phrase: i.phrase, ruleId: i.ruleId }),
+      }))
+      .filter((s) => !dismissed.has(dismissKey(s)));
+
+    const praiseSuggestions: ParagraphSuggestion[] = (fb.praises ?? [])
       .map((p) => ({
         paragraphIndex,
         paragraphHash,
@@ -113,7 +126,7 @@ export const useSuggestionsStore = create<Store>((set, get) => ({
       }))
       .filter((s) => !dismissed.has(dismissKey(s)));
 
-    const newOnes = [...issueSuggestions, ...praiseSuggestions];
+    const newOnes = [...issueSuggestions, ...improveSuggestions, ...praiseSuggestions];
 
     set((state) => ({
       paragraphSuggestions: [

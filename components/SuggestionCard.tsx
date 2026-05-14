@@ -15,17 +15,32 @@ export function SuggestionCard({
   onDismiss: () => void;
 }) {
   const rule = ruleById(s.ruleId);
-  const isIssue = s.kind === "issue";
-  const accent = isIssue
-    ? "border-rose-300 bg-rose-50/60"
-    : "border-emerald-300 bg-emerald-50/60";
-  const ringClass = isFocused
-    ? isIssue
-      ? "ring-2 ring-rose-400"
-      : "ring-2 ring-emerald-400"
-    : "";
 
-  const canApply = isIssue && typeof s.suggestion === "string" && s.suggestion.length > 0;
+  // Per-tier styling. Issue = rose, improve = amber, praise = emerald.
+  const themed = {
+    issue: {
+      border: "border-rose-300 bg-rose-50/60",
+      ring: "ring-2 ring-rose-400",
+      buttonBorder: "border-rose-400 text-rose-700 hover:bg-rose-100",
+      buttonLabel: "Apply rewrite",
+    },
+    improve: {
+      border: "border-amber-300 bg-amber-50/60",
+      ring: "ring-2 ring-amber-400",
+      buttonBorder: "border-amber-500 text-amber-800 hover:bg-amber-100",
+      buttonLabel: "Try this",
+    },
+    praise: {
+      border: "border-emerald-300 bg-emerald-50/60",
+      ring: "ring-2 ring-emerald-400",
+      buttonBorder: "border-emerald-400 text-emerald-700 hover:bg-emerald-100",
+      buttonLabel: "🎉 Nice",
+    },
+  }[s.kind];
+
+  const ringClass = isFocused ? themed.ring : "";
+  const isPraise = s.kind === "praise";
+  const canApply = !isPraise && typeof s.suggestion === "string" && s.suggestion.length > 0;
 
   const handleApply = () => {
     const w = window as unknown as {
@@ -35,18 +50,14 @@ export function SuggestionCard({
         replacement: string
       ) => boolean;
     };
-    const applied = w.__wwApplySuggestion?.(s.paragraphIndex, s.phrase, s.suggestion ?? "");
-    // Whether the replacement landed or not, drop the card from view so it
-    // doesn't sit stale. If it didn't land, the next analysis pass will resurface
-    // it (or its successor) on the new paragraph state.
+    w.__wwApplySuggestion?.(s.paragraphIndex, s.phrase, s.suggestion ?? "");
     onDismiss();
-    return applied;
   };
 
   return (
     <div
       onClick={onFocus}
-      className={`rounded-lg border ${accent} ${ringClass} p-4 mb-3 cursor-pointer transition-shadow hover:shadow-sm`}
+      className={`rounded-lg border ${themed.border} ${ringClass} p-4 mb-3 cursor-pointer transition-shadow hover:shadow-sm`}
     >
       <div className="flex items-start justify-between gap-2">
         <div className="text-sm uppercase tracking-wide text-stone-500">
@@ -76,33 +87,28 @@ export function SuggestionCard({
       )}
 
       <div className="mt-3 flex justify-end">
-        {isIssue ? (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleApply();
-            }}
-            disabled={!canApply}
-            className={`text-sm px-3 py-1 rounded-full border transition
-              ${canApply
-                ? "border-rose-400 text-rose-700 hover:bg-rose-100"
-                : "border-stone-200 text-stone-300 cursor-not-allowed"}`}
-            title={canApply ? "Apply this rewrite to the document" : "No rewrite to apply"}
-          >
-            Apply rewrite
-          </button>
-        ) : (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onDismiss();
-            }}
-            className="text-sm px-3 py-1 rounded-full border border-emerald-400 text-emerald-700 hover:bg-emerald-100"
-            title="Celebrate this and move on"
-          >
-            🎉 Nice
-          </button>
-        )}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            isPraise ? onDismiss() : handleApply();
+          }}
+          disabled={!isPraise && !canApply}
+          className={`text-sm px-3 py-1 rounded-full border transition
+            ${
+              (!isPraise && !canApply)
+                ? "border-stone-200 text-stone-300 cursor-not-allowed"
+                : themed.buttonBorder
+            }`}
+          title={
+            isPraise
+              ? "Celebrate this and move on"
+              : canApply
+              ? "Replace the phrase in the document"
+              : "No rewrite to apply"
+          }
+        >
+          {themed.buttonLabel}
+        </button>
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import {
   setFocusedHighlightMeta,
   type HighlightSpec,
 } from "@/lib/decorations/highlightPlugin";
+import { forbiddenPlugin } from "@/lib/decorations/forbiddenPlugin";
 import { useSuggestionsStore } from "@/lib/store/suggestions";
 import { shouldAnalyze } from "@/lib/trigger/sentenceTrigger";
 import { shouldRunDocumentPass } from "@/lib/trigger/documentTrigger";
@@ -22,7 +23,7 @@ import { fnv1a } from "@/lib/util/hash";
 const HighlightExt = Extension.create({
   name: "wwHighlight",
   addProseMirrorPlugins() {
-    return [highlightPlugin()];
+    return [highlightPlugin(), forbiddenPlugin()];
   },
 });
 
@@ -39,9 +40,9 @@ function getParagraphTexts(editor: ReturnType<typeof useEditor>): string[] {
   return out;
 }
 
-const SEED = `<h1>be one in a million</h1>
-<p>Start typing here. As you complete sentences or paragraphs, WinningWord will quietly flag prose that violates the "Winning Writing" rules — and celebrate prose that follows them.</p>
-<p>Try pasting this sample: I am currently working for Google and we are in the process of investigating ways to improve the system. We successfully got the project approved.</p>`;
+const SEED = `<h1><em>Be one in a million.</em></h1>
+<p>Write. We flag the flab. We cheer the punch.</p>
+<p>Try pasting this sample: I am currently working for Google and we are in the process of investigating ways to improve Docs. We successfully got the project approved. Brilliant.</p>`;
 
 export function Editor() {
   const upsertParagraph = useSuggestionsStore((s) => s.upsertParagraph);

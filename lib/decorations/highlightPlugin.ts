@@ -6,7 +6,7 @@ export type HighlightSpec = {
   uid: string;
   paragraphIndex: number;
   phrase: string;
-  kind: "issue" | "praise";
+  kind: "issue" | "improve" | "praise";
 };
 
 export type HighlightPluginState = {
@@ -72,7 +72,8 @@ function buildDecorations(
     if (idx < 0) continue;
     const from = para.from + idx;
     const to = from + h.phrase.length;
-    const baseClass = h.kind === "issue" ? "ww-issue" : "ww-praise";
+    const baseClass =
+      h.kind === "issue" ? "ww-issue" : h.kind === "improve" ? "ww-improve" : "ww-praise";
     const cls = h.uid === focusedUid ? `${baseClass} is-focused` : baseClass;
     decorations.push(
       Decoration.inline(from, to, {

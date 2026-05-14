@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useSuggestionsStore } from "@/lib/store/suggestions";
+import { useSuggestionsStore, type ParagraphSuggestion } from "@/lib/store/suggestions";
 import { SuggestionCard } from "./SuggestionCard";
 import { DocumentFeedback } from "./DocumentFeedback";
 
 type Tab = "coaching" | "document";
+type ParagraphSuggestionKind = ParagraphSuggestion["kind"];
 
 export function SuggestionsPanel() {
   const suggestions = useSuggestionsStore((s) => s.paragraphSuggestions);
@@ -19,11 +20,16 @@ export function SuggestionsPanel() {
 
   const [tab, setTab] = useState<Tab>("coaching");
 
+  // Sort: paragraph order first, then by severity (issue > improve > praise).
+  const kindOrder: Record<ParagraphSuggestionKind, number> = {
+    issue: 0,
+    improve: 1,
+    praise: 2,
+  };
   const ordered = [...suggestions].sort((a, b) => {
     if (a.paragraphIndex !== b.paragraphIndex)
       return a.paragraphIndex - b.paragraphIndex;
-    if (a.kind !== b.kind) return a.kind === "issue" ? -1 : 1;
-    return 0;
+    return kindOrder[a.kind] - kindOrder[b.kind];
   });
 
   const coachingBadge = ordered.length || pendingParagraphs.size;
@@ -31,7 +37,7 @@ export function SuggestionsPanel() {
     docObservations.length || (oneSentenceSummary ? 1 : 0) || (pendingDocument ? 1 : 0);
 
   return (
-    <aside className="h-full w-full md:w-[30rem] border-l border-stone-200 bg-paper/70 flex flex-col">
+    <aside className="h-full w-full border-l border-stone-200 bg-paper/70 flex flex-col">
       {/* Tabs row */}
       <div className="flex items-center justify-between border-b border-stone-200 px-2">
         <div className="flex">
@@ -40,7 +46,7 @@ export function SuggestionsPanel() {
             badge={coachingBadge}
             onClick={() => setTab("coaching")}
           >
-            Coaching
+            Editor
           </TabButton>
           <TabButton
             active={tab === "document"}

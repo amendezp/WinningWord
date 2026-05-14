@@ -25,7 +25,11 @@ export async function POST(req: NextRequest) {
   }
   const body = (await req.json()) as RequestBody;
   if (!body.focusParagraph || body.focusParagraph.trim().length < 4) {
-    return NextResponse.json({ issues: [], praises: [] } satisfies ParagraphFeedback);
+    return NextResponse.json({
+      issues: [],
+      improvements: [],
+      praises: [],
+    } satisfies ParagraphFeedback);
   }
 
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -63,24 +67,25 @@ export async function POST(req: NextRequest) {
 
   const toolUse = resp.content.find((b): b is Anthropic.Messages.ToolUseBlock => b.type === "tool_use");
   if (!toolUse) {
-    return NextResponse.json({ issues: [], praises: [] } satisfies ParagraphFeedback);
+    return NextResponse.json({
+      issues: [],
+      improvements: [],
+      praises: [],
+    } satisfies ParagraphFeedback);
   }
   const raw = toolUse.input as ParagraphFeedback;
 
   // Defensive filtering: drop anything that doesn't appear in the paragraph
   // (the model occasionally paraphrases) or cites an unknown ruleId.
-  const issues = (raw.issues ?? []).filter(
-    (i) =>
-      VALID_PARAGRAPH_RULE_IDS.has(i.ruleId) &&
-      body.focusParagraph.includes(i.phrase)
+  const inText = (phrase: string) => body.focusParagraph.includes(phrase);
+  const validRule = (id: string) => VALID_PARAGRAPH_RULE_IDS.has(id);
+  const issues = (raw.issues ?? []).filter((i) => validRule(i.ruleId) && inText(i.phrase));
+  const improvements = (raw.improvements ?? []).filter(
+    (i) => validRule(i.ruleId) && inText(i.phrase)
   );
-  const praises = (raw.praises ?? []).filter(
-    (p) =>
-      VALID_PARAGRAPH_RULE_IDS.has(p.ruleId) &&
-      body.focusParagraph.includes(p.phrase)
-  );
+  const praises = (raw.praises ?? []).filter((p) => validRule(p.ruleId) && inText(p.phrase));
 
-  return NextResponse.json({ issues, praises } satisfies ParagraphFeedback);
+  return NextResponse.json({ issues, improvements, praises } satisfies ParagraphFeedback);
   } catch (err) {
     const e = err as { status?: number; message?: string };
     console.error("[/api/analyze-paragraph] Anthropic call failed:", e.status, e.message);

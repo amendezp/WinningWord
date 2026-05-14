@@ -1,5 +1,5 @@
 export type RuleScope = "paragraph" | "document";
-export type HighlightKind = "issue" | "praise";
+export type HighlightKind = "issue" | "improve" | "praise";
 
 export type RuleExample = {
   before: string;

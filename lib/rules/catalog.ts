@@ -132,6 +132,23 @@ export const RULES: Rule[] = [
     ],
   },
 
+  // ============= PARAGRAPH-SCOPED IMPROVE RULES =============
+  // "Yellow" tier — not violations, but candidates for tightening.
+  {
+    id: "ing_verb",
+    scope: "paragraph",
+    highlightKind: "improve",
+    name: "Tighten the -ing verb",
+    shortDesc: "Progressive verbs often weaken. Try a tighter form.",
+    longDesc:
+      "Progressive tense ('we are investigating', 'she is leading', 'the team is preparing') often pads what could be a punchier verb. Not always wrong — sometimes the progressive sense is exactly right — but worth a second look. Cut to the simple form when you can: 'we investigate', 'she leads', 'the team prepares'.",
+    examples: [
+      { before: "We are investigating new approaches.", after: "We investigate new approaches." },
+      { before: "She is leading the team.", after: "She leads the team." },
+      { before: "The team is preparing the release.", after: "The team prepares the release." },
+    ],
+  },
+
   // ============= PARAGRAPH-SCOPED PRAISE RULES =============
   {
     id: "vivid_specificity",
@@ -239,6 +256,10 @@ export const RULES: Rule[] = [
 
 export const PARAGRAPH_RULES = RULES.filter((r) => r.scope === "paragraph");
 export const DOCUMENT_RULES = RULES.filter((r) => r.scope === "document");
+
+export const PARAGRAPH_ISSUE_RULES = PARAGRAPH_RULES.filter((r) => r.highlightKind === "issue");
+export const PARAGRAPH_IMPROVE_RULES = PARAGRAPH_RULES.filter((r) => r.highlightKind === "improve");
+export const PARAGRAPH_PRAISE_RULES = PARAGRAPH_RULES.filter((r) => r.highlightKind === "praise");
 
 export function ruleById(id: string): Rule | undefined {
   return RULES.find((r) => r.id === id);

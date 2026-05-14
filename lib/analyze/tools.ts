@@ -3,38 +3,45 @@ import type Anthropic from "@anthropic-ai/sdk";
 export const paragraphTool: Anthropic.Tool = {
   name: "report_paragraph_feedback",
   description:
-    "Report writing issues and praises for the focus paragraph. Use this tool exactly once per response.",
+    "Report writing feedback in three tiers for the focus paragraph: hard issues (red), improvements (yellow), and praises (green). Use this tool exactly once per response.",
   input_schema: {
     type: "object",
     properties: {
       issues: {
         type: "array",
+        description: "Hard violations the writer should fix.",
         items: {
           type: "object",
           properties: {
             phrase: {
               type: "string",
-              description:
-                "Exact verbatim substring of the focus paragraph to highlight.",
+              description: "Exact verbatim substring of the focus paragraph to highlight.",
             },
-            ruleId: {
-              type: "string",
-              description: "Rule id from the catalog.",
-            },
-            rationale: {
-              type: "string",
-              description: "≤140 chars. Plain language.",
-            },
-            suggestion: {
-              type: "string",
-              description: "Optional concrete rewrite of the phrase.",
-            },
+            ruleId: { type: "string", description: "Rule id from the issue-tier catalog." },
+            rationale: { type: "string", description: "≤140 chars. Plain language." },
+            suggestion: { type: "string", description: "Concrete rewrite of the phrase." },
           },
           required: ["phrase", "ruleId", "rationale"],
         },
       },
+      improvements: {
+        type: "array",
+        description: "Soft 'yellow' suggestions — not wrong, but worth tightening.",
+        items: {
+          type: "object",
+          properties: {
+            phrase: { type: "string", description: "Exact verbatim substring." },
+            ruleId: { type: "string", description: "Rule id from the improve-tier catalog." },
+            rationale: { type: "string", description: "≤140 chars." },
+            suggestion: { type: "string", description: "Tighter rewrite of the phrase." },
+          },
+          required: ["phrase", "ruleId", "rationale", "suggestion"],
+        },
+      },
       praises: {
         type: "array",
+        description:
+          "Moments of *genuinely strong* writing. Be stingy — most paragraphs deserve zero. Praise only prose that would make a reader stop and notice.",
         items: {
           type: "object",
           properties: {
@@ -46,7 +53,7 @@ export const paragraphTool: Anthropic.Tool = {
         },
       },
     },
-    required: ["issues", "praises"],
+    required: ["issues", "improvements", "praises"],
   },
 };
 
@@ -90,6 +97,12 @@ export type ParagraphFeedback = {
     ruleId: string;
     rationale: string;
     suggestion?: string;
+  }>;
+  improvements: Array<{
+    phrase: string;
+    ruleId: string;
+    rationale: string;
+    suggestion: string;
   }>;
   praises: Array<{
     phrase: string;
