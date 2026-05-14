@@ -93,7 +93,9 @@ export function SuggestionsPanel() {
                 key={s.uid}
                 s={s}
                 isFocused={focusedUid === s.uid}
-                onFocus={() => focus(s.uid)}
+                // Click-to-toggle: clicking a focused card unfocuses (collapses) it,
+                // clicking an unfocused card focuses (expands) it.
+                onFocus={() => focus(focusedUid === s.uid ? undefined : s.uid)}
                 onDismiss={() => dismiss(s.uid)}
               />
             ))}
