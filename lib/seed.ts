@@ -14,7 +14,7 @@ import type { ParagraphFeedback, DocumentFeedback } from "@/lib/analyze/tools";
  * and the seed is overwritten with whatever the model returns.
  */
 export const SEED_HTML = `<h1><em>Be one in a million.</em></h1>
-<p>Type below. After every couple of sentences, WinningWord scans your prose against the Winning Writing rules. Red marks the flab to cut. Yellow nudges you tighter. Green celebrates the punch.</p>
+<p>Type below. After every couple of sentences, WinningWord scans your prose against the Winning Writing rules. Write on.</p>
 <p>Try pasting this sample: I am currently working for Google and we are in the process of investigating ways to improve Docs. We successfully got the project approved. Brilliant.</p>`;
 
 /**
