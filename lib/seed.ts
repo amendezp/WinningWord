@@ -24,20 +24,30 @@ export const SEED_HTML = `<h1><em>Be one in a million.</em></h1>
  *   1 → explainer paragraph
  *   2 → sample paragraph (the one we actually want to demo on)
  */
+// Seed suggestions are crafted so that *if the user applies every rewrite*,
+// the final paragraph reads cleanly:
+//
+//   "I work at Google and we investigate ways to improve Docs.
+//    We got the project approved. Brilliant."
+//
+// Every rewrite must itself follow Winning Writing — no -ing verbs in
+// suggestions, no weak adverbs, no jargon. Otherwise we'd be hypocritical.
 export const SEED_PARAGRAPH_SUGGESTIONS: Record<number, ParagraphFeedback> = {
   2: {
     issues: [
       {
-        phrase: "currently working",
+        phrase: "I am currently working for Google",
         ruleId: "wordiness",
-        rationale: "Drop 'currently' — the present tense already says now.",
-        suggestion: "working",
+        rationale:
+          "'Currently' is redundant and 'I am working' is bloated progressive. Drop both for a tight 'I work at Google'.",
+        suggestion: "I work at Google",
       },
       {
-        phrase: "in the process of investigating",
+        phrase: "we are in the process of investigating",
         ruleId: "wordiness",
-        rationale: "'In the process of' is filler. Cut to the verb.",
-        suggestion: "investigating",
+        rationale:
+          "'In the process of' is filler and 'are X-ing' bloats further. Simple present hits harder.",
+        suggestion: "we investigate",
       },
       {
         phrase: "successfully got the project approved",

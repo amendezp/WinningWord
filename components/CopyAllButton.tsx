@@ -23,13 +23,17 @@ export function CopyAllButton() {
       ? "Couldn't copy"
       : "Copy entire document";
 
+  const showLabel = state !== "idle";
+  const labelText = state === "copied" ? "Copied to clipboard" : "Couldn't copy";
+
   return (
     <button
       onClick={handleClick}
       title={title}
       aria-label={title}
-      className={`group flex items-center justify-center w-11 h-11 rounded-full
-        bg-paper/95 border shadow-sm transition
+      className={`group flex items-center gap-2 h-11 rounded-full
+        bg-paper/95 border shadow-sm transition-all duration-200
+        ${showLabel ? "px-4" : "w-11 justify-center"}
         ${
           state === "copied"
             ? "border-emerald-400 text-emerald-700"
@@ -39,6 +43,9 @@ export function CopyAllButton() {
         }`}
     >
       {state === "copied" ? <CheckIcon /> : <ClipboardIcon />}
+      {showLabel && (
+        <span className="text-sm font-medium whitespace-nowrap">{labelText}</span>
+      )}
     </button>
   );
 }

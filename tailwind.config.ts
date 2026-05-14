@@ -13,7 +13,9 @@ const config: Config = {
         sans: ['"Inter"', "system-ui", "sans-serif"],
       },
       colors: {
-        ink: "#1a1a1a",
+        // Warm dark gray, not pure black. Matches Typora's softer body tone —
+        // easier on the eye than #000 on cream paper.
+        ink: "#33302c",
         paper: "#fafaf7",
       },
     },

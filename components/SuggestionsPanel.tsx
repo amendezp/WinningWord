@@ -38,32 +38,23 @@ export function SuggestionsPanel() {
 
   return (
     <aside className="h-full w-full border-l border-stone-200 bg-paper/70 flex flex-col">
-      {/* Tabs row */}
-      <div className="flex items-center justify-between border-b border-stone-200 px-2">
-        <div className="flex">
-          <TabButton
-            active={tab === "coaching"}
-            badge={coachingBadge}
-            onClick={() => setTab("coaching")}
-          >
-            Editor
-          </TabButton>
-          <TabButton
-            active={tab === "document"}
-            badge={documentBadge}
-            onClick={() => setTab("document")}
-          >
-            Document
-          </TabButton>
-        </div>
-        <button
-          onClick={() =>
-            (window as unknown as { __wwForceDocumentPass?: () => void }).__wwForceDocumentPass?.()
-          }
-          className="text-sm text-stone-500 hover:text-stone-900 underline-offset-2 hover:underline pr-3"
+      {/* Tabs row — minimalist by design. The Document pass runs automatically
+          (every 5 paragraph passes or 30s of idle); no manual refresh button. */}
+      <div className="flex items-center border-b border-stone-200 px-2">
+        <TabButton
+          active={tab === "coaching"}
+          badge={coachingBadge}
+          onClick={() => setTab("coaching")}
         >
-          Review now
-        </button>
+          Editor
+        </TabButton>
+        <TabButton
+          active={tab === "document"}
+          badge={documentBadge}
+          onClick={() => setTab("document")}
+        >
+          Document
+        </TabButton>
       </div>
 
       {/* Tab body */}

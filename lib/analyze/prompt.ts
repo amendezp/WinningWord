@@ -38,6 +38,8 @@ Strict requirements:
 - The "phrase" you return MUST be a verbatim substring of the focus paragraph. If it isn't, the highlight will silently fail. No paraphrasing.
 - Rationale ≤140 chars. Plain language. No hedging.
 - Provide a "suggestion" rewrite when one fits — required for improvements, common on issues, never on praises.
+- **Suggestions themselves must obey the Winning Writing rules.** Specifically: NO progressive -ing verbs in your suggested rewrites ("we investigate" not "we are investigating", "she leads" not "she is leading"). NO weak adverbs in suggestions. NO useless jargon. The rewrite must read like Kramon wrote it.
+- When rewriting, expand the flagged phrase if needed to produce a clean result. For "I am currently working at Google", flag the whole phrase and suggest "I work at Google" — not just removing "currently" (which would leave the weak progressive "I am working").
 - Be sparing. Most paragraphs should have 0–3 issues, 0–2 improvements, 0–1 praises. Do not stretch.
 - Do NOT flag the same phrase twice under different rule ids.
 - Do NOT cite a rule id that isn't in the catalog.
