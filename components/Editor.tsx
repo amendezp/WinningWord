@@ -19,6 +19,7 @@ import { shouldAnalyze } from "@/lib/trigger/sentenceTrigger";
 import { shouldRunDocumentPass } from "@/lib/trigger/documentTrigger";
 import { analyzeParagraph, analyzeDocument } from "@/lib/analyze/client";
 import { fnv1a } from "@/lib/util/hash";
+import { normalizeAdjacency } from "@/lib/util/normalizeAdjacency";
 import {
   SEED_HTML,
   SEED_PARAGRAPH_SUGGESTIONS,
@@ -319,6 +320,11 @@ export function Editor() {
 
     // Replace the first occurrence of `phrase` inside paragraph `paragraphIndex`
     // with `replacement`. Returns true if a replacement happened.
+    //
+    // Post-apply, we run a small cleanup pass over the seam to fix the
+    // common AI rewrite artifacts (double space, "ways ways"-style
+    // duplicate words, doubled punctuation). Window is intentionally narrow
+    // so formatting elsewhere in the paragraph stays intact.
     w.__wwApplySuggestion = (paragraphIndex, phrase, replacement) => {
       if (!editor) return false;
       let from = -1;
@@ -335,6 +341,23 @@ export function Editor() {
       if (from < 0) return false;
       const to = from + phrase.length;
       editor.chain().focus().setTextSelection({ from, to }).insertContent(replacement).run();
+
+      // Cleanup pass over a small window around the new insertion seam.
+      // 3 chars before, 30 after — enough to catch boundary artifacts
+      // without flattening formatting deeper in the paragraph.
+      const insertEnd = from + replacement.length;
+      const docSize = editor.state.doc.content.size;
+      const winFrom = Math.max(0, from - 3);
+      const winTo = Math.min(docSize, insertEnd + 30);
+      const before = editor.state.doc.textBetween(winFrom, winTo, "\n");
+      const after = normalizeAdjacency(before);
+      if (after !== before) {
+        editor
+          .chain()
+          .setTextSelection({ from: winFrom, to: winTo })
+          .insertContent(after)
+          .run();
+      }
       return true;
     };
 

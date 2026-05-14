@@ -40,6 +40,11 @@ Strict requirements:
 - Provide a "suggestion" rewrite when one fits — required for improvements, common on issues, never on praises.
 - **Suggestions themselves must obey the Winning Writing rules.** Specifically: NO progressive -ing verbs in your suggested rewrites ("we investigate" not "we are investigating", "she leads" not "she is leading"). NO weak adverbs in suggestions. NO useless jargon. The rewrite must read like Kramon wrote it.
 - When rewriting, expand the flagged phrase if needed to produce a clean result. For "I am currently working at Google", flag the whole phrase and suggest "I work at Google" — not just removing "currently" (which would leave the weak progressive "I am working").
+- **Suggestions must be drop-in replacements.** Your text will be substituted EXACTLY for the phrase you cite — no extra processing. So:
+    - No leading or trailing whitespace in the suggestion (unless the original phrase had it).
+    - The last word of your suggestion must NOT be the same as the word that immediately follows the phrase in the doc. ("we are investigating ways" → "we investigate", not "we investigate ways" — that would produce "we investigate ways ways".)
+    - The first word of your suggestion must NOT duplicate the word immediately before the phrase.
+    - Preserve any sentence-ending punctuation that was part of the phrase.
 - Be sparing. Most paragraphs should have 0–3 issues, 0–2 improvements, 0–1 praises. Do not stretch.
 - Do NOT flag the same phrase twice under different rule ids.
 - Do NOT cite a rule id that isn't in the catalog.
