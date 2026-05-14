@@ -51,6 +51,7 @@ export function Editor() {
   const setPendingParagraph = useSuggestionsStore((s) => s.setPendingParagraph);
   const setPendingDocument = useSuggestionsStore((s) => s.setPendingDocument);
   const focus = useSuggestionsStore((s) => s.focus);
+  const pruneStale = useSuggestionsStore((s) => s.pruneStale);
   const paragraphSuggestions = useSuggestionsStore((s) => s.paragraphSuggestions);
   const focusedUid = useSuggestionsStore((s) => s.focusedUid);
 
@@ -184,6 +185,10 @@ export function Editor() {
       const paragraphs = getParagraphTexts(editor);
       const docBody = paragraphs.join("\n\n");
       const now = Date.now();
+      // Drop any suggestion whose phrase has been deleted, or whose paragraph
+      // no longer exists. This is the fast path that keeps the sidebar honest
+      // between full re-analyses.
+      pruneStale(paragraphs);
       for (let i = 0; i < paragraphs.length; i++) {
         const text = paragraphs[i];
         if (inflightRef.current.has(i)) continue;
@@ -215,7 +220,7 @@ export function Editor() {
       }
     }, 700);
     return () => clearInterval(interval);
-  }, [editor, runParagraphPass, runDocumentPass]);
+  }, [editor, runParagraphPass, runDocumentPass, pruneStale]);
 
   // Track every edit (update lastEditAt; fire paragraph-completed analysis on hard break).
   useEffect(() => {

@@ -29,6 +29,9 @@ type Store = {
     fb: ParagraphFeedback,
     options?: { respectDismissed?: boolean }
   ) => void;
+  // Drop suggestions whose paragraph no longer exists, or whose flagged phrase
+  // has been removed from the doc. Cheap; safe to call on every editor tick.
+  pruneStale: (currentParagraphs: string[]) => void;
   setDocumentFeedback: (fb: DocumentFeedback) => void;
   dismiss: (uid: string) => void;
   setPendingParagraph: (idx: number, pending: boolean) => void;
@@ -139,6 +142,21 @@ export const useSuggestionsStore = create<Store>((set, get) => ({
         ...newOnes,
       ],
     }));
+  },
+
+  pruneStale: (currentParagraphs) => {
+    set((state) => {
+      const next = state.paragraphSuggestions.filter((s) => {
+        // Paragraph deleted entirely (or index drifted past the new range)
+        if (s.paragraphIndex >= currentParagraphs.length) return false;
+        // Phrase no longer present in the paragraph it was anchored to
+        if (!currentParagraphs[s.paragraphIndex].includes(s.phrase)) return false;
+        return true;
+      });
+      // Avoid re-renders when nothing changed.
+      if (next.length === state.paragraphSuggestions.length) return state;
+      return { paragraphSuggestions: next };
+    });
   },
 
   setDocumentFeedback: (fb) => {
