@@ -20,11 +20,7 @@ import { shouldRunDocumentPass } from "@/lib/trigger/documentTrigger";
 import { analyzeParagraph, analyzeDocument } from "@/lib/analyze/client";
 import { fnv1a } from "@/lib/util/hash";
 import { normalizeAdjacency } from "@/lib/util/normalizeAdjacency";
-import {
-  SEED_HTML,
-  SEED_PARAGRAPH_SUGGESTIONS,
-  SEED_DOCUMENT_FEEDBACK,
-} from "@/lib/seed";
+import { SEED_HTML, SEED_PARAGRAPH_SUGGESTIONS } from "@/lib/seed";
 
 const HighlightExt = Extension.create({
   name: "wwHighlight",
@@ -174,7 +170,9 @@ export function Editor() {
       lastAnalyzedTextRef.current.set(i, text);
       lastAttemptedTextRef.current.set(i, text);
     }
-    setDocumentFeedback(SEED_DOCUMENT_FEEDBACK);
+    // Mark the seed text as already-analyzed so Pass B doesn't try to run on
+    // placeholder content. The word-count guard in documentTrigger.ts also
+    // backs this up — Pass B only fires after the user has added real content.
     docTriggerRef.current.lastAnalyzedDocText = paragraphs.join("\n\n");
     docTriggerRef.current.lastDocAnalyzedAt = Date.now();
   }, [editor, upsertParagraph, setDocumentFeedback]);

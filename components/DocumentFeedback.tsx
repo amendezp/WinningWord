@@ -19,9 +19,9 @@ export function DocumentFeedback({ alwaysOpen = false }: { alwaysOpen?: boolean 
   if (!hasContent) {
     return alwaysOpen ? (
       <div className="text-base text-stone-500 italic mt-2 leading-relaxed">
-        No document feedback yet. After a few paragraphs (or 30s of stillness, or
-        a click on “Review now”), a holistic pass appears here — audience fit,
-        BLUF, redundancy, and a one-sentence summary.
+        Document feedback appears once you&apos;ve written enough for there to be
+        structure to comment on. Keep typing — audience fit, BLUF, redundancy,
+        and a one-sentence summary will show up here.
       </div>
     ) : null;
   }

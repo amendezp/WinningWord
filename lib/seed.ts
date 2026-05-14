@@ -1,4 +1,4 @@
-import type { ParagraphFeedback, DocumentFeedback } from "@/lib/analyze/tools";
+import type { ParagraphFeedback } from "@/lib/analyze/tools";
 
 /**
  * Initial document content + pre-baked suggestions for the demo.
@@ -67,13 +67,8 @@ export const SEED_PARAGRAPH_SUGGESTIONS: Record<number, ParagraphFeedback> = {
   },
 };
 
-/**
- * Pre-seeded document-level feedback so the Document tab has content on first
- * load too. Pass B is skipped at startup; the user can hit "Review now" to
- * refresh against current state.
- */
-export const SEED_DOCUMENT_FEEDBACK: DocumentFeedback = {
-  one_sentence_summary:
-    "A demo document showing how WinningWord coaches you on bloat, weak verbs, and punch.",
-  observations: [],
-};
+// We intentionally do NOT seed document-level feedback. The Document tab
+// stays empty until the user has written ≥80 words of real content, at
+// which point Pass B fires and produces meaningful feedback. Seeding a
+// placeholder summary used to lead to confusing "this is placeholder copy"
+// commentary from the model.

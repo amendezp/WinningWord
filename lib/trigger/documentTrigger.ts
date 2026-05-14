@@ -21,13 +21,23 @@ export type DocumentTriggerState = {
 const DOC_IDLE_MS = 30_000;
 const PASS_A_THRESHOLD = 5;
 const MIN_THROTTLE_MS = 15_000;
+// Word count is a better signal than character count for "is there a real
+// document here yet". The seed is ~54 words, so this threshold suppresses
+// Pass B on placeholder-shaped content.
+const MIN_WORDS = 80;
+
+function countWords(text: string): number {
+  const trimmed = text.trim();
+  if (!trimmed) return 0;
+  return trimmed.split(/\s+/).length;
+}
 
 export function shouldRunDocumentPass(
   state: DocumentTriggerState,
   now: number,
   currentDocText: string
 ): boolean {
-  if (currentDocText.length < 100) return false;
+  if (countWords(currentDocText) < MIN_WORDS) return false;
   // Hard guard against the idle-loop: don't re-analyze unchanged text.
   if (currentDocText === state.lastAnalyzedDocText) return false;
   if (now - state.lastDocAnalyzedAt < MIN_THROTTLE_MS) return false;
