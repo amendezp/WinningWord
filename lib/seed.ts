@@ -15,7 +15,7 @@ import type { ParagraphFeedback } from "@/lib/analyze/tools";
  */
 export const SEED_HTML = `<h1><em>Be one in a million.</em></h1>
 <p>Type below. After every couple of sentences, WinningWord scans your prose against the Winning Writing rules. Write on.</p>
-<p>Try pasting this sample: I am currently working for Google and we are in the process of investigating ways to improve Docs. We successfully got the project approved. Brilliant.</p>`;
+<p>Try pasting this sample: I am currently working for Google and we are in the process of investigating ways to improve Google Docs. We successfully got the project approved. Brilliant!</p>`;
 
 /**
  * Suggestions keyed by paragraph index (top-level textblock order in the doc).
@@ -59,7 +59,7 @@ export const SEED_PARAGRAPH_SUGGESTIONS: Record<number, ParagraphFeedback> = {
     improvements: [],
     praises: [
       {
-        phrase: "Brilliant.",
+        phrase: "Brilliant!",
         ruleId: "punchy_brevity",
         rationale: "Single-word punch. Maximum impact, minimum words. Perfect close.",
       },
