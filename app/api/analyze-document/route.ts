@@ -6,7 +6,9 @@ import { documentTool, type DocumentFeedback } from "@/lib/analyze/tools";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-const MODEL = "claude-sonnet-4-5";
+// Pass B runs rarely and needs holistic reasoning (BLUF, audience, redundancy,
+// arc). Worth Sonnet. Override via WW_DOCUMENT_MODEL.
+const MODEL = process.env.WW_DOCUMENT_MODEL ?? "claude-sonnet-4-6";
 
 type RequestBody = { documentBody: string };
 
@@ -23,6 +25,8 @@ export async function POST(req: NextRequest) {
   }
 
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+  try {
 
   const resp = await client.messages.create({
     model: MODEL,
@@ -61,4 +65,12 @@ export async function POST(req: NextRequest) {
     observations,
     one_sentence_summary: raw.one_sentence_summary,
   } satisfies DocumentFeedback);
+  } catch (err) {
+    const e = err as { status?: number; message?: string };
+    console.error("[/api/analyze-document] Anthropic call failed:", e.status, e.message);
+    return NextResponse.json(
+      { error: `Anthropic call failed: ${e.message ?? "unknown"}`, status: e.status },
+      { status: 502 }
+    );
+  }
 }

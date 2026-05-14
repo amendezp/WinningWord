@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "WinningWord",
-  description: "A word processor that coaches you in real time on Glenn Kramon's Winning Writing.",
+  description: "A word processor that coaches you in real time on the Winning Writing rules.",
 };
 
 export default function RootLayout({

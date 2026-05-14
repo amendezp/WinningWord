@@ -49,7 +49,21 @@ Effort is rough: **S** = a few hours, **M** = half a day to a day, **L** = multi
 
 ## Tier 3 — Larger bets
 
-### 9. Audience research mode (attributed, accurate facts about the recipient)
+### 9. Fact-check mode
+- **Effort:** M–L · **Impact:** High
+- A separate dedicated pass that scans the document for claim-like statements ("X grew 80%", "the FDA banned Y in 2014") and verifies them. Two-layer approach:
+  - **Heuristic**: numbers, dates, named entities, definitive verbs ("invented", "discovered", "first") get marked as candidate claims.
+  - **Verification**: each candidate goes through a separate API call using Anthropic web search with strict instructions — every verified or refuted claim returns a URL and a verbatim quote. If the model can't find a source, it says "unverified" rather than guessing.
+- Output: a new sidebar tab "Facts" alongside Coaching / Document, listing each claim with status (✓ verified · ✗ contradicted · ? unverified) and the source link.
+- Risk: hallucinated citations. Mitigate with an eval suite of known-true and known-false claims; require URL + quote in the tool schema.
+
+### 10. Structure review (suggest paragraph reorders / merges / splits)
+- **Effort:** M · **Impact:** High
+- Distinct from per-paragraph coaching. Operates on the *outline* of the document: each paragraph reduced to its core point, then the model proposes structural moves: "Paragraph 3 belongs before paragraph 2", "Paragraphs 5 and 6 cover the same ground — merge them", "This long paragraph is two ideas — split after the second sentence."
+- Renders in the **Document** tab below the BLUF/audience observations, as an ordered list of move suggestions with "Apply" buttons that actually reorder/split/merge blocks in the TipTap doc.
+- New rule scope: `structure` (third option alongside `paragraph` and `document`) so the catalog stays the source of truth.
+
+### 11. Audience research mode (attributed, accurate facts about the recipient)
 - **Effort:** L · **Impact:** High but risky
 - The hardest one. The user wants real signals: childhood hero, favorite music, hobbies — *attributed to a source*, never fabricated. Hallucination risk is severe.
 - Approach: web search tool calls (Anthropic web search) with strict prompt: every fact returned MUST carry a URL and a verbatim quote. If the model can't find it, it says so explicitly. No interpolation.

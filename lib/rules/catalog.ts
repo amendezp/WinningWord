@@ -5,7 +5,7 @@ import type { Rule } from "./types";
  * Add a new rule = append an entry. Editor, prompts, /rules viewer,
  * and eval runner all read from here.
  *
- * Distilled from Glenn Kramon's "The Best of Winning Writing" (Dec 2025).
+ * Distilled from "The Best of Winning Writing" (Dec 2025).
  */
 export const RULES: Rule[] = [
   // ============= PARAGRAPH-SCOPED ISSUE RULES =============
@@ -140,7 +140,7 @@ export const RULES: Rule[] = [
     name: "Vivid, specific detail",
     shortDesc: "Concrete imagery the reader can picture.",
     longDesc:
-      "Kramon: 'Picture your favorite movie scene. Describe it in words.' Sensory or numeric detail makes prose memorable — applaud when the writer brings something to life.",
+      "Picture your favorite movie scene. Describe it in words.' Sensory or numeric detail makes prose memorable — applaud when the writer brings something to life.",
     examples: [
       { before: "Drink your daily prenatal vitamins in a light, refreshing 12oz beverage reminiscent of coconut water." },
     ],
@@ -178,7 +178,7 @@ export const RULES: Rule[] = [
     name: "BLUF — Bottom Line Up Front",
     shortDesc: "Get to the point in the first sentence, not the last.",
     longDesc:
-      "Kramon's RULE FOUR: people are impatient. The most important thing goes first. If your main point is buried at the end, the reader is gone.",
+      "Winning Writing RULE FOUR: people are impatient. The most important thing goes first. If your main point is buried at the end, the reader is gone.",
     examples: [
       {
         before: "I am the co-founder of BorrowBear, a peer-to-peer rental marketplace that is scaling at 100% month-over-month and recently passed 10,000 users. The goal is to become the Airbnb of everything...",
@@ -193,7 +193,7 @@ export const RULES: Rule[] = [
     name: "Audience clarity",
     shortDesc: "Who is this for? What do they care about?",
     longDesc:
-      "Kramon's RULE ONE. Before you write, identify the audience and what result you want from them. If the document doesn't betray a clear audience, flag it.",
+      "Winning Writing RULE ONE. Before you write, identify the audience and what result you want from them. If the document doesn't betray a clear audience, flag it.",
     examples: [
       {
         before: "Generic vendor pitch addressed to no one.",
@@ -208,7 +208,7 @@ export const RULES: Rule[] = [
     name: "One-sentence test",
     shortDesc: "If you boiled it down to one sentence, what would it say?",
     longDesc:
-      "Kramon's RULE TWO. Before writing, you should be able to state the core idea in one phrase, sentence, or paragraph. The model attempts this and offers it back so you can compare against what you actually wrote.",
+      "Winning Writing RULE TWO. Before writing, you should be able to state the core idea in one phrase, sentence, or paragraph. The model attempts this and offers it back so you can compare against what you actually wrote.",
     examples: [
       { before: "Long meandering pitch.", after: "Diamonds Aren't Forever." },
     ],

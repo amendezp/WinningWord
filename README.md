@@ -1,6 +1,6 @@
 # WinningWord
 
-A clean, Typora-style word processor that coaches you in real time on Glenn Kramon's *"Winning Writing"* lessons (Stanford GSB).
+A clean, Typora-style word processor that coaches you in real time on the *"Winning Writing"* lessons (Stanford GSB).
 
 - Type prose in a minimalist serif editor.
 - WinningWord watches for completed sentences and paragraphs and quietly highlights:
@@ -19,6 +19,16 @@ npm run dev
 ```
 
 Open <http://localhost:3000>.
+
+### Gotcha: shell env vars shadow `.env.local`
+
+If you've already exported `ANTHROPIC_API_KEY` in your shell (especially as an empty string, e.g. from an old `~/.zshrc` line), Next.js will **not** overwrite it with the value in `.env.local`. Symptom: the route returns `ANTHROPIC_API_KEY is not set` even though `.env.local` looks correct.
+
+```bash
+echo "len: ${#ANTHROPIC_API_KEY}"   # 0 = empty-but-exported; that wins
+```
+
+Fix: `unset ANTHROPIC_API_KEY` before `npm run dev`, or remove the offending export from your shell rc.
 
 ## Adding a new "Winning Writing" lesson
 

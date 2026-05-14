@@ -1,61 +1,123 @@
 "use client";
 
+import { useState } from "react";
 import { useSuggestionsStore } from "@/lib/store/suggestions";
 import { SuggestionCard } from "./SuggestionCard";
 import { DocumentFeedback } from "./DocumentFeedback";
 
+type Tab = "coaching" | "document";
+
 export function SuggestionsPanel() {
   const suggestions = useSuggestionsStore((s) => s.paragraphSuggestions);
   const pendingParagraphs = useSuggestionsStore((s) => s.pendingParagraphIndices);
+  const docObservations = useSuggestionsStore((s) => s.docObservations);
+  const oneSentenceSummary = useSuggestionsStore((s) => s.oneSentenceSummary);
+  const pendingDocument = useSuggestionsStore((s) => s.pendingDocument);
   const focusedUid = useSuggestionsStore((s) => s.focusedUid);
   const dismiss = useSuggestionsStore((s) => s.dismiss);
   const focus = useSuggestionsStore((s) => s.focus);
 
+  const [tab, setTab] = useState<Tab>("coaching");
+
   const ordered = [...suggestions].sort((a, b) => {
     if (a.paragraphIndex !== b.paragraphIndex)
       return a.paragraphIndex - b.paragraphIndex;
-    // Issues before praise within a paragraph.
     if (a.kind !== b.kind) return a.kind === "issue" ? -1 : 1;
     return 0;
   });
 
+  const coachingBadge = ordered.length || pendingParagraphs.size;
+  const documentBadge =
+    docObservations.length || (oneSentenceSummary ? 1 : 0) || (pendingDocument ? 1 : 0);
+
   return (
-    <aside className="h-full w-full md:w-[30rem] border-l border-stone-200 bg-paper/70 px-5 py-6 overflow-y-auto">
-      <div className="flex items-center justify-between mb-5">
-        <h2 className="text-base font-medium tracking-wide text-stone-700">
-          Coaching
-        </h2>
+    <aside className="h-full w-full md:w-[30rem] border-l border-stone-200 bg-paper/70 flex flex-col">
+      {/* Tabs row */}
+      <div className="flex items-center justify-between border-b border-stone-200 px-2">
+        <div className="flex">
+          <TabButton
+            active={tab === "coaching"}
+            badge={coachingBadge}
+            onClick={() => setTab("coaching")}
+          >
+            Coaching
+          </TabButton>
+          <TabButton
+            active={tab === "document"}
+            badge={documentBadge}
+            onClick={() => setTab("document")}
+          >
+            Document
+          </TabButton>
+        </div>
         <button
           onClick={() =>
             (window as unknown as { __wwForceDocumentPass?: () => void }).__wwForceDocumentPass?.()
           }
-          className="text-sm text-stone-500 hover:text-stone-900 underline-offset-2 hover:underline"
+          className="text-sm text-stone-500 hover:text-stone-900 underline-offset-2 hover:underline pr-3"
         >
           Review now
         </button>
       </div>
 
-      <DocumentFeedback />
-
-      {ordered.length === 0 && pendingParagraphs.size === 0 && (
-        <div className="text-base text-stone-500 italic mt-6 leading-relaxed">
-          Nothing flagged yet. Write a couple of sentences and pause — coaching will appear here.
-        </div>
-      )}
-
-      {pendingParagraphs.size > 0 && ordered.length === 0 && (
-        <div className="text-base text-stone-400 italic mt-6">Analyzing…</div>
-      )}
-
-      {ordered.map((s) => (
-        <SuggestionCard
-          key={s.uid}
-          s={s}
-          isFocused={focusedUid === s.uid}
-          onFocus={() => focus(s.uid)}
-          onDismiss={() => dismiss(s.uid)}
-        />
-      ))}
+      {/* Tab body */}
+      <div className="flex-1 overflow-y-auto px-5 py-5">
+        {tab === "coaching" ? (
+          <>
+            {ordered.length === 0 && pendingParagraphs.size === 0 && (
+              <div className="text-base text-stone-500 italic mt-2 leading-relaxed">
+                Nothing flagged yet. Write a couple of sentences and pause — coaching will appear here.
+              </div>
+            )}
+            {pendingParagraphs.size > 0 && ordered.length === 0 && (
+              <div className="text-base text-stone-400 italic mt-2">Analyzing…</div>
+            )}
+            {ordered.map((s) => (
+              <SuggestionCard
+                key={s.uid}
+                s={s}
+                isFocused={focusedUid === s.uid}
+                onFocus={() => focus(s.uid)}
+                onDismiss={() => dismiss(s.uid)}
+              />
+            ))}
+          </>
+        ) : (
+          <DocumentFeedback alwaysOpen />
+        )}
+      </div>
     </aside>
+  );
+}
+
+function TabButton({
+  active,
+  badge,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  badge: number;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`relative px-4 py-3 text-sm font-medium tracking-wide transition
+        ${active
+          ? "text-stone-900 border-b-2 border-stone-800"
+          : "text-stone-500 hover:text-stone-700 border-b-2 border-transparent"}`}
+    >
+      {children}
+      {badge > 0 && (
+        <span
+          className={`ml-2 inline-flex items-center justify-center text-[10px] font-semibold rounded-full px-1.5 min-w-[1.25rem] h-5 align-middle
+            ${active ? "bg-stone-800 text-stone-50" : "bg-stone-200 text-stone-600"}`}
+        >
+          {badge}
+        </span>
+      )}
+    </button>
   );
 }

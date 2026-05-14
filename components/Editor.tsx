@@ -39,8 +39,8 @@ function getParagraphTexts(editor: ReturnType<typeof useEditor>): string[] {
   return out;
 }
 
-const SEED = `<h1>Welcome to WinningWord</h1>
-<p>Start typing here. As you complete sentences or paragraphs, WinningWord will quietly flag prose that violates Glenn Kramon's "Winning Writing" lessons — and celebrate prose that follows them.</p>
+const SEED = `<h1>be one in a million</h1>
+<p>Start typing here. As you complete sentences or paragraphs, WinningWord will quietly flag prose that violates the "Winning Writing" rules — and celebrate prose that follows them.</p>
 <p>Try pasting this sample: I am currently working for Google and we are in the process of investigating ways to improve the system. We successfully got the project approved.</p>`;
 
 export function Editor() {
@@ -61,7 +61,12 @@ export function Editor() {
   const lastEditAtRef = useRef<number>(Date.now());
   const inflightRef = useRef<Map<number, AbortController>>(new Map());
   const docInflightRef = useRef<AbortController | null>(null);
-  const docTriggerRef = useRef({
+  const docTriggerRef = useRef<{
+    passACountSinceLastB: number;
+    lastEditAt: number;
+    lastDocAnalyzedAt: number;
+    lastAnalyzedDocText?: string;
+  }>({
     passACountSinceLastB: 0,
     lastEditAt: Date.now(),
     lastDocAnalyzedAt: 0,
@@ -129,6 +134,9 @@ export function Editor() {
         const fb = await analyzeDocument({ documentBody: docBody, signal: ac.signal });
         setDocumentFeedback(fb);
         docTriggerRef.current.passACountSinceLastB = 0;
+        // Critical for idle-loop prevention: mark this text as analyzed so
+        // the trigger doesn't refire on identical content while the user sits idle.
+        docTriggerRef.current.lastAnalyzedDocText = docBody;
       } catch (err) {
         if ((err as { name?: string }).name === "AbortError") return;
         console.error("analyzeDocument failed:", err);
@@ -170,7 +178,7 @@ export function Editor() {
       }
       // Document pass
       if (
-        shouldRunDocumentPass(docTriggerRef.current, now, docBody.length) &&
+        shouldRunDocumentPass(docTriggerRef.current, now, docBody) &&
         !docInflightRef.current
       ) {
         void runDocumentPass(docBody);
@@ -253,15 +261,59 @@ export function Editor() {
     return () => dom.removeEventListener("ww:highlight-click", handler);
   }, [editor, focus]);
 
-  // Surface a global function so the sidebar's "Review now" button can trigger Pass B.
+  // Surface globals so the sidebar buttons can drive the editor.
+  // (We use window-level handles to avoid threading the editor through a context
+  //  just for two buttons — same pattern as `__wwForceDocumentPass`.)
   useEffect(() => {
-    (window as unknown as { __wwForceDocumentPass?: () => void }).__wwForceDocumentPass = () => {
+    const w = window as unknown as {
+      __wwForceDocumentPass?: () => void;
+      __wwCopyAll?: () => Promise<boolean>;
+      __wwApplySuggestion?: (paragraphIndex: number, phrase: string, replacement: string) => boolean;
+    };
+
+    w.__wwForceDocumentPass = () => {
       if (!editor) return;
       const paragraphs = getParagraphTexts(editor);
       void runDocumentPass(paragraphs.join("\n\n"));
     };
+
+    w.__wwCopyAll = async () => {
+      if (!editor) return false;
+      // Plain text from the editor preserves paragraph breaks via \n\n.
+      const text = getParagraphTexts(editor).join("\n\n");
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
+    // Replace the first occurrence of `phrase` inside paragraph `paragraphIndex`
+    // with `replacement`. Returns true if a replacement happened.
+    w.__wwApplySuggestion = (paragraphIndex, phrase, replacement) => {
+      if (!editor) return false;
+      let from = -1;
+      let paraIdx = 0;
+      editor.state.doc.descendants((node, pos) => {
+        if (!node.isTextblock) return true;
+        if (paraIdx === paragraphIndex) {
+          const idx = node.textContent.indexOf(phrase);
+          if (idx >= 0) from = pos + 1 + idx;
+        }
+        paraIdx += 1;
+        return false;
+      });
+      if (from < 0) return false;
+      const to = from + phrase.length;
+      editor.chain().focus().setTextSelection({ from, to }).insertContent(replacement).run();
+      return true;
+    };
+
     return () => {
-      delete (window as unknown as { __wwForceDocumentPass?: () => void }).__wwForceDocumentPass;
+      delete w.__wwForceDocumentPass;
+      delete w.__wwCopyAll;
+      delete w.__wwApplySuggestion;
     };
   }, [editor, runDocumentPass]);
 

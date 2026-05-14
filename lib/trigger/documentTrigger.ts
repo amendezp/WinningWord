@@ -1,28 +1,36 @@
 /**
  * Pass B (whole-document) trigger.
  *
- * Fires when ANY of:
+ * Fires when ALL of:
+ *   - the document text has changed since the last successful Pass B
+ *     (this is the key guard — without it, the idle condition below
+ *      would re-fire every 15s as long as the user sits idle)
+ * AND ANY of:
  *   - 30s of idle time since the last edit
  *   - 5 successful Pass A analyses since the last Pass B
- *   - user clicked "Review" (handled outside this module)
+ *   - user clicked "Review" (bypasses this function entirely)
  */
 
 export type DocumentTriggerState = {
   passACountSinceLastB: number;
   lastEditAt: number;
   lastDocAnalyzedAt: number;
+  lastAnalyzedDocText?: string;
 };
 
 const DOC_IDLE_MS = 30_000;
 const PASS_A_THRESHOLD = 5;
+const MIN_THROTTLE_MS = 15_000;
 
 export function shouldRunDocumentPass(
   state: DocumentTriggerState,
   now: number,
-  docLength: number
+  currentDocText: string
 ): boolean {
-  if (docLength < 100) return false;
-  if (now - state.lastDocAnalyzedAt < 15_000) return false; // throttle
+  if (currentDocText.length < 100) return false;
+  // Hard guard against the idle-loop: don't re-analyze unchanged text.
+  if (currentDocText === state.lastAnalyzedDocText) return false;
+  if (now - state.lastDocAnalyzedAt < MIN_THROTTLE_MS) return false;
 
   if (state.passACountSinceLastB >= PASS_A_THRESHOLD) return true;
   if (now - state.lastEditAt >= DOC_IDLE_MS) return true;

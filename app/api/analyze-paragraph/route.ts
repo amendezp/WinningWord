@@ -6,7 +6,10 @@ import { paragraphTool, type ParagraphFeedback } from "@/lib/analyze/tools";
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
-const MODEL = "claude-sonnet-4-5";
+// Pass A runs on every trigger — keep it cheap. Haiku 4.5 is plenty smart for
+// the pattern-recognition work this pass does (wordiness, weak adverbs, etc.)
+// and is ~4× cheaper than Sonnet. Override via WW_PARAGRAPH_MODEL if needed.
+const MODEL = process.env.WW_PARAGRAPH_MODEL ?? "claude-haiku-4-5-20251001";
 
 type RequestBody = {
   focusParagraph: string;
@@ -26,6 +29,8 @@ export async function POST(req: NextRequest) {
   }
 
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+
+  try {
 
   const userBlocks: Anthropic.Messages.ContentBlockParam[] = [];
 
@@ -76,4 +81,12 @@ export async function POST(req: NextRequest) {
   );
 
   return NextResponse.json({ issues, praises } satisfies ParagraphFeedback);
+  } catch (err) {
+    const e = err as { status?: number; message?: string };
+    console.error("[/api/analyze-paragraph] Anthropic call failed:", e.status, e.message);
+    return NextResponse.json(
+      { error: `Anthropic call failed: ${e.message ?? "unknown"}`, status: e.status },
+      { status: 502 }
+    );
+  }
 }

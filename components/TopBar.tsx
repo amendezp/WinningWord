@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CopyAllButton } from "./CopyAllButton";
 
 export function TopBar() {
   return (
@@ -7,6 +8,7 @@ export function TopBar() {
         WinningWord
       </Link>
       <nav className="flex items-center gap-5 text-sm text-stone-500">
+        <CopyAllButton />
         <Link href="/rules" className="hover:text-stone-900">
           Rules
         </Link>
