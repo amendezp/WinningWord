@@ -166,7 +166,10 @@ export function Editor() {
       const text = paragraphs[i];
       const seeded = SEED_PARAGRAPH_SUGGESTIONS[i];
       if (seeded) {
-        upsertParagraph(i, fnv1a(text), seeded);
+        // Bypass localStorage dismissals — the seed is the canonical demo
+        // state and should show in full every time. Real AI suggestions
+        // (returned after the user edits) still honour dismissals.
+        upsertParagraph(i, fnv1a(text), seeded, { respectDismissed: false });
       }
       lastAnalyzedTextRef.current.set(i, text);
       lastAttemptedTextRef.current.set(i, text);

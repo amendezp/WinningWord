@@ -26,7 +26,8 @@ type Store = {
   upsertParagraph: (
     paragraphIndex: number,
     paragraphHash: string,
-    fb: ParagraphFeedback
+    fb: ParagraphFeedback,
+    options?: { respectDismissed?: boolean }
   ) => void;
   setDocumentFeedback: (fb: DocumentFeedback) => void;
   dismiss: (uid: string) => void;
@@ -85,8 +86,12 @@ export const useSuggestionsStore = create<Store>((set, get) => ({
   focusedUid: undefined,
   dismissedKeys: loadDismissed(),
 
-  upsertParagraph: (paragraphIndex, paragraphHash, fb) => {
-    const dismissed = get().dismissedKeys;
+  upsertParagraph: (paragraphIndex, paragraphHash, fb, options) => {
+    // Default is to honour user dismissals; the seed effect passes
+    // `respectDismissed: false` so the demo state is always shown in full.
+    const dismissed = options?.respectDismissed === false
+      ? new Set<string>()
+      : get().dismissedKeys;
 
     const issueSuggestions: ParagraphSuggestion[] = (fb.issues ?? [])
       .map((i) => ({
