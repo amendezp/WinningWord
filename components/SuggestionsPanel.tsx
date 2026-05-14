@@ -82,7 +82,7 @@ export function SuggestionsPanel() {
           <>
             {ordered.length === 0 && pendingParagraphs.size === 0 && (
               <div className="text-base text-stone-500 italic mt-2 leading-relaxed">
-                Nothing flagged yet. Write a couple of sentences and pause — coaching will appear here.
+                Nothing flagged yet. Write a couple of sentences and pause. Editor&apos;s suggestion will appear here.
               </div>
             )}
             {pendingParagraphs.size > 0 && ordered.length === 0 && (
