@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSuggestionsStore, type ParagraphSuggestion } from "@/lib/store/suggestions";
 import { SuggestionCard } from "./SuggestionCard";
 import { DocumentFeedback } from "./DocumentFeedback";
@@ -19,6 +19,25 @@ export function SuggestionsPanel() {
   const focus = useSuggestionsStore((s) => s.focus);
 
   const [tab, setTab] = useState<Tab>("coaching");
+
+  // When a highlight is clicked in the editor, focusedUid changes. Switch to
+  // the Editor tab (if needed) and scroll the matching card into view —
+  // `block: "nearest"` skips the scroll entirely when the card is already
+  // fully visible, so the panel doesn't jump for no reason.
+  useEffect(() => {
+    if (!focusedUid) return;
+    if (tab !== "coaching") setTab("coaching");
+    // Wait one frame so React renders the cards (in case we just switched tabs).
+    const id = window.setTimeout(() => {
+      const card = document.querySelector<HTMLElement>(
+        `[data-ww-card-uid="${CSS.escape(focusedUid)}"]`
+      );
+      card?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }, 30);
+    return () => window.clearTimeout(id);
+    // We deliberately don't depend on `tab` — switching tabs shouldn't re-scroll.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusedUid]);
 
   // Sort: paragraph order first, then by severity (issue > improve > praise).
   const kindOrder: Record<ParagraphSuggestionKind, number> = {

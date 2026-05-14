@@ -56,6 +56,7 @@ export function SuggestionCard({
 
   return (
     <div
+      data-ww-card-uid={s.uid}
       onClick={onFocus}
       className={`rounded-lg border ${themed.border} ${ringClass} p-4 mb-3 cursor-pointer transition-shadow hover:shadow-sm`}
     >
