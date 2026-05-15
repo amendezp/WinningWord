@@ -1,16 +1,22 @@
 import type { ParagraphFeedback, DocumentFeedback } from "./tools";
+import type { AnalysisMeta, ProviderId } from "./providers/types";
+
+export type ParagraphResponse = ParagraphFeedback & { meta: AnalysisMeta };
+export type DocumentResponse = DocumentFeedback & { meta: AnalysisMeta };
 
 export async function analyzeParagraph(args: {
   focusParagraph: string;
   documentBody: string;
+  provider: ProviderId;
   signal?: AbortSignal;
-}): Promise<ParagraphFeedback> {
+}): Promise<ParagraphResponse> {
   const resp = await fetch("/api/analyze-paragraph", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
       focusParagraph: args.focusParagraph,
       documentBody: args.documentBody,
+      provider: args.provider,
     }),
     signal: args.signal,
   });
@@ -18,22 +24,26 @@ export async function analyzeParagraph(args: {
     const detail = await resp.text().catch(() => "");
     throw new Error(`analyze-paragraph ${resp.status}: ${detail}`);
   }
-  return (await resp.json()) as ParagraphFeedback;
+  return (await resp.json()) as ParagraphResponse;
 }
 
 export async function analyzeDocument(args: {
   documentBody: string;
+  provider: ProviderId;
   signal?: AbortSignal;
-}): Promise<DocumentFeedback> {
+}): Promise<DocumentResponse> {
   const resp = await fetch("/api/analyze-document", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ documentBody: args.documentBody }),
+    body: JSON.stringify({
+      documentBody: args.documentBody,
+      provider: args.provider,
+    }),
     signal: args.signal,
   });
   if (!resp.ok) {
     const detail = await resp.text().catch(() => "");
     throw new Error(`analyze-document ${resp.status}: ${detail}`);
   }
-  return (await resp.json()) as DocumentFeedback;
+  return (await resp.json()) as DocumentResponse;
 }

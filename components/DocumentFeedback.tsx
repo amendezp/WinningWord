@@ -8,6 +8,7 @@ export function DocumentFeedback({ alwaysOpen = false }: { alwaysOpen?: boolean 
   const observations = useSuggestionsStore((s) => s.docObservations);
   const oneSentence = useSuggestionsStore((s) => s.oneSentenceSummary);
   const pending = useSuggestionsStore((s) => s.pendingDocument);
+  const lastDocMeta = useSuggestionsStore((s) => s.lastDocMeta);
   const [open, setOpen] = useState(true);
   const expanded = alwaysOpen || open;
 
@@ -28,6 +29,11 @@ export function DocumentFeedback({ alwaysOpen = false }: { alwaysOpen?: boolean 
 
   const body = (
     <div className={alwaysOpen ? "space-y-3" : "px-3 pb-3 space-y-2"}>
+      {lastDocMeta && lastDocMeta.latencyMs > 0 && (
+        <div className="text-[10px] uppercase tracking-wide text-stone-400">
+          {lastDocMeta.latencyMs}ms · {lastDocMeta.provider}
+        </div>
+      )}
       {oneSentence && (
         <div className="text-base">
           <div className="text-xs uppercase tracking-wide text-stone-500 mb-1">

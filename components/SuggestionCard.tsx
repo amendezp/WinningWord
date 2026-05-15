@@ -103,6 +103,14 @@ export function SuggestionCard({
         </div>
       )}
 
+      {/* Latency + provider attribution — only when we have real meta
+          (seeded suggestions have neither). */}
+      {s.latencyMs !== undefined && (
+        <div className="mt-1.5 text-[10px] uppercase tracking-wide text-stone-400">
+          {s.latencyMs}ms{s.provider && s.provider !== "anthropic" ? ` · ${s.provider}` : ""}
+        </div>
+      )}
+
       {/* Primary action — only shown when expanded so the compact card stays clean.
           The full card click is plenty for "open me", so no separate expand button. */}
       {expanded && (

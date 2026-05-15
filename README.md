@@ -13,12 +13,23 @@ A clean, Typora-style word processor that coaches you in real time on the *"Winn
 
 ```bash
 cp .env.example .env.local
-# paste your Anthropic API key into .env.local
+# paste your Anthropic API key (and optionally an Inception API key) into .env.local
 npm install
 npm run dev
 ```
 
 Open <http://localhost:3000>.
+
+## Providers
+
+WinningWord can route analysis through either:
+
+- **Anthropic Claude** (default) — autoregressive. Haiku 4.5 for paragraph coaching, Sonnet 4.6 for whole-document analysis.
+- **Inception Labs Mercury** — diffusion. Same prompts and tool schemas, OpenAI-compatible endpoint.
+
+A toggle in the top bar swaps between them at runtime. Selection persists in `localStorage`. Every suggestion card and document observation shows the latency it took to produce — useful for comparing the two models live as you write.
+
+To use Mercury, get an `INCEPTION_API_KEY` from <https://platform.inceptionlabs.ai> (10M free tokens on signup) and paste it into `.env.local` alongside the Anthropic key.
 
 ### Gotcha: shell env vars shadow `.env.local`
 
@@ -37,16 +48,17 @@ Edit `lib/rules/catalog.ts` — see `lib/rules/README.md`. The editor, prompts, 
 ## Running evals
 
 ```bash
-npm run eval
+npm run eval                        # Anthropic (default)
+WW_PROVIDER=inception npm run eval  # Mercury
 ```
 
-Asserts that every fixture in `evals/fixtures/ww-before-after.json` triggers the expected rule. Prints a per-rule pass rate. Use this whenever you add a rule.
+Runs every fixture in `evals/fixtures/ww-before-after.json` through the selected provider. Prints per-rule pass rate and a latency summary (mean / p50 / p95). Use this when you add a rule, switch a model, or want a head-to-head comparison between providers.
 
 ## Deploy to Vercel
 
 1. Push to GitHub.
 2. Import the repo in Vercel.
-3. Set `ANTHROPIC_API_KEY` under Project → Settings → Environment Variables.
+3. Set `ANTHROPIC_API_KEY` (and `INCEPTION_API_KEY` if you want the Mercury toggle to work) under Project → Settings → Environment Variables.
 4. Deploy.
 
 The API routes are server-only — the key never reaches the browser.

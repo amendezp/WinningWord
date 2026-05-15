@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { ParagraphFeedback, DocumentFeedback } from "@/lib/analyze/tools";
+import type { AnalysisMeta, ProviderId } from "@/lib/analyze/providers/types";
 
 export type ParagraphSuggestion = {
   paragraphIndex: number;
@@ -11,6 +12,10 @@ export type ParagraphSuggestion = {
   kind: "issue" | "improve" | "praise";
   // Stable identifier so React lists can key off it and dismissal stays scoped.
   uid: string;
+  // Provider attribution + latency for the comparison UX. Optional because
+  // seeded suggestions have neither.
+  latencyMs?: number;
+  provider?: ProviderId;
 };
 
 export type DocObservation = DocumentFeedback["observations"][number];
@@ -27,12 +32,13 @@ type Store = {
     paragraphIndex: number,
     paragraphHash: string,
     fb: ParagraphFeedback,
-    options?: { respectDismissed?: boolean }
+    options?: { respectDismissed?: boolean; meta?: AnalysisMeta }
   ) => void;
   // Drop suggestions whose paragraph no longer exists, or whose flagged phrase
   // has been removed from the doc. Cheap; safe to call on every editor tick.
   pruneStale: (currentParagraphs: string[]) => void;
-  setDocumentFeedback: (fb: DocumentFeedback) => void;
+  setDocumentFeedback: (fb: DocumentFeedback, meta?: AnalysisMeta) => void;
+  lastDocMeta?: AnalysisMeta;
   dismiss: (uid: string) => void;
   setPendingParagraph: (idx: number, pending: boolean) => void;
   setPendingDocument: (pending: boolean) => void;
@@ -95,6 +101,7 @@ export const useSuggestionsStore = create<Store>((set, get) => ({
     const dismissed = options?.respectDismissed === false
       ? new Set<string>()
       : get().dismissedKeys;
+    const meta = options?.meta;
 
     const issueSuggestions: ParagraphSuggestion[] = (fb.issues ?? [])
       .map((i) => ({
@@ -106,6 +113,8 @@ export const useSuggestionsStore = create<Store>((set, get) => ({
         suggestion: i.suggestion,
         kind: "issue" as const,
         uid: makeUid({ paragraphIndex, phrase: i.phrase, ruleId: i.ruleId }),
+        latencyMs: meta?.latencyMs,
+        provider: meta?.provider,
       }))
       .filter((s) => !dismissed.has(dismissKey(s)));
 
@@ -119,6 +128,8 @@ export const useSuggestionsStore = create<Store>((set, get) => ({
         suggestion: i.suggestion,
         kind: "improve" as const,
         uid: makeUid({ paragraphIndex, phrase: i.phrase, ruleId: i.ruleId }),
+        latencyMs: meta?.latencyMs,
+        provider: meta?.provider,
       }))
       .filter((s) => !dismissed.has(dismissKey(s)));
 
@@ -131,6 +142,8 @@ export const useSuggestionsStore = create<Store>((set, get) => ({
         rationale: p.rationale,
         kind: "praise" as const,
         uid: makeUid({ paragraphIndex, phrase: p.phrase, ruleId: p.ruleId }),
+        latencyMs: meta?.latencyMs,
+        provider: meta?.provider,
       }))
       .filter((s) => !dismissed.has(dismissKey(s)));
 
@@ -159,10 +172,11 @@ export const useSuggestionsStore = create<Store>((set, get) => ({
     });
   },
 
-  setDocumentFeedback: (fb) => {
+  setDocumentFeedback: (fb, meta) => {
     set({
       docObservations: fb.observations,
       oneSentenceSummary: fb.one_sentence_summary,
+      lastDocMeta: meta,
     });
   },
 

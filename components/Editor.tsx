@@ -15,6 +15,7 @@ import {
 } from "@/lib/decorations/highlightPlugin";
 import { forbiddenPlugin } from "@/lib/decorations/forbiddenPlugin";
 import { useSuggestionsStore } from "@/lib/store/suggestions";
+import { useProviderStore } from "@/lib/store/providerPreference";
 import { shouldAnalyze } from "@/lib/trigger/sentenceTrigger";
 import { shouldRunDocumentPass } from "@/lib/trigger/documentTrigger";
 import { analyzeParagraph, analyzeDocument } from "@/lib/analyze/client";
@@ -54,6 +55,7 @@ export function Editor() {
   const focus = useSuggestionsStore((s) => s.focus);
   const pruneStale = useSuggestionsStore((s) => s.pruneStale);
   const paragraphSuggestions = useSuggestionsStore((s) => s.paragraphSuggestions);
+  const providerId = useProviderStore((s) => s.providerId);
   const focusedUid = useSuggestionsStore((s) => s.focusedUid);
 
   // Per-paragraph trigger state, keyed by paragraph index.
@@ -105,12 +107,14 @@ export function Editor() {
 
       setPendingParagraph(paragraphIndex, true);
       try {
-        const fb = await analyzeParagraph({
+        const resp = await analyzeParagraph({
           focusParagraph: paragraphText,
           documentBody: docBody,
+          provider: providerId,
           signal: ac.signal,
         });
-        upsertParagraph(paragraphIndex, fnv1a(paragraphText), fb);
+        const { meta, ...feedback } = resp;
+        upsertParagraph(paragraphIndex, fnv1a(paragraphText), feedback, { meta });
         lastAnalyzedTextRef.current.set(paragraphIndex, paragraphText);
         docTriggerRef.current.passACountSinceLastB += 1;
       } catch (err) {
@@ -123,7 +127,7 @@ export function Editor() {
         }
       }
     };
-  }, [setPendingParagraph, upsertParagraph]);
+  }, [setPendingParagraph, upsertParagraph, providerId]);
 
   const runDocumentPass = useMemo(() => {
     return async (docBody: string) => {
@@ -135,8 +139,13 @@ export function Editor() {
       docTriggerRef.current.lastDocAnalyzedAt = Date.now();
       setPendingDocument(true);
       try {
-        const fb = await analyzeDocument({ documentBody: docBody, signal: ac.signal });
-        setDocumentFeedback(fb);
+        const resp = await analyzeDocument({
+          documentBody: docBody,
+          provider: providerId,
+          signal: ac.signal,
+        });
+        const { meta, ...feedback } = resp;
+        setDocumentFeedback(feedback, meta);
         docTriggerRef.current.passACountSinceLastB = 0;
         // Critical for idle-loop prevention: mark this text as analyzed so
         // the trigger doesn't refire on identical content while the user sits idle.
@@ -149,7 +158,7 @@ export function Editor() {
         if (docInflightRef.current === ac) docInflightRef.current = null;
       }
     };
-  }, [setDocumentFeedback, setPendingDocument]);
+  }, [setDocumentFeedback, setPendingDocument, providerId]);
 
   // One-time mount-seed: pre-populate suggestions + document feedback from
   // lib/seed.ts, then mark every initial paragraph as already-analyzed so the
