@@ -115,6 +115,164 @@ Use **Mercury 2 for Pass B** — quality is identical, latency is 8× better, an
 
 That's the "Hybrid" mode in the top-bar toggle.
 
+## All 29 fixtures, annotated
+
+The fixtures live in `evals/fixtures/ww-before-after.json`. Reading them is the fastest way to understand both the rule catalog and the kinds of text that should (and should not) trigger each rule.
+
+### Paragraph positives — 21 cases
+
+Each must produce **at least one flag** with the named rule.
+
+#### `wordiness` (3 cases)
+
+**1. currently + in the process of**
+> *I am currently working for Google and we are in the process of investigating ways to improve the system.*
+Expected phrase: `currently` OR `in the process of`.
+
+**2. in the event that**
+> *In the event that it rains tomorrow, the outdoor presentation will be moved indoors at no additional cost.*
+Expected phrase: `In the event that`.
+
+**3. at this point in time**
+> *At this point in time, the team has not yet decided which vendor to choose for the renovation project.*
+Expected phrase: `At this point in time`.
+
+#### `weak_adverb` (2 cases)
+
+**4. successfully got**
+> *After months of work, I successfully got the scholarship and absolutely crushed the interview.*
+Expected phrase: `successfully` OR `absolutely`.
+
+**5. completely crushed it**
+> *Our small team completely crushed the quarterly target and totally smashed every retention milestone.*
+Expected phrase: `completely` OR `totally`.
+
+#### `powerful_word` (2 cases)
+
+**6. incredibly smart → brilliant**
+> *Our new lead engineer is incredibly smart and the team trusts her judgment on every release.*
+Expected phrase: `incredibly smart`.
+
+**7. extremely important → crucial**
+> *It is extremely important that we ship this on time for an especially unusual reason.*
+Expected phrase: `extremely important` OR `especially unusual`.
+
+#### `weak_verb` (2 cases)
+
+**8. utilize + facilitate → use + help**
+> *We will utilize the new framework to facilitate faster onboarding for all new hires next quarter.*
+Expected phrase: `utilize` OR `facilitate`.
+
+**9. incentivize → encourage**
+> *We must incentivize the sales team and operationalize the new pricing model before the end of Q4.*
+Expected phrase: `incentivize` OR `operationalize`.
+
+#### `synonym_pair` (2 cases)
+
+**10. inspiring and constructive**
+> *You can show you are an inspiring and constructive leader by how you write.*
+Expected phrase: `inspiring and constructive`.
+
+**11. rare and extraordinary**
+> *She is a rare and extraordinary talent who joined us last summer from a clear and obvious rival.*
+Expected phrase: `rare and extraordinary` OR `clear and obvious`.
+
+#### `useless_jargon` (2 cases)
+
+**12. ecommerce space**
+> *I work in the ecommerce space and we are seeing rapid growth this quarter.*
+Expected phrase: `space`.
+
+**13. crisis situation**
+> *When the outage hit, we treated it as a crisis situation and rolled out our action plan within an hour.*
+Expected phrase: `situation` OR `action plan`.
+
+#### `who_vs_that` (1 case)
+
+**14. alumni that donate**
+> *GSB alumni that donate to the school have a profound effect on the next generation of students.*
+Expected phrase: `that`.
+
+#### `dangling_modifier` (1 case)
+
+**15. renowned investor**
+> *As a renowned and savvy investor, I would love to spend 30 minutes with you to hear your feedback regarding my investment thesis.*
+Expected phrase: `As a renowned and savvy investor`.
+
+#### `destructive_phrasing` (1 case)
+
+**16. this is boring**
+> *This presentation is boring and the analysis is irrational.*
+Expected phrase: `boring` OR `irrational`.
+
+#### `ing_verb` (2 cases — yellow tier)
+
+**17. is leading / is preparing**
+> *Our team is leading the integration and is preparing the launch plan for next quarter.*
+Expected phrase: `is leading` OR `is preparing`.
+
+**18. is mentoring / is rewriting**
+> *She is mentoring three new hires while she is rewriting the onboarding handbook.*
+Expected phrase: `is mentoring` OR `is rewriting`.
+
+#### Praise (3 cases — green tier)
+
+**19. punchy brevity**
+> *Diamonds aren't forever.*
+Expected: `punchy_brevity`. 3-word tagline with no hedges.
+
+**20. strong short verb**
+> *The fire gutted the warehouse. The owner crushed by debt watched it burn.*
+Expected: `strong_short_verb`. Monosyllabic action verbs (`gutted`, `crushed`) carrying the sentences.
+
+**21. vivid specificity**
+> *Drink your daily prenatal vitamins in a light, refreshing 12oz beverage reminiscent of coconut water.*
+Expected: `vivid_specificity`. Measurement + named comparison.
+
+### Paragraph negatives — 4 cases
+
+Each must produce **zero flags** of the named rules. Catches false positives.
+
+**22. NEG: clean prose, no -ing flag** (must not fire `ing_verb`)
+> *The team ships every Friday. We track three metrics: latency, errors, and revenue per request.*
+Reason: no progressive verbs anywhere — clean simple-present prose.
+
+**23. NEG: "had had" — genuine repetition** (must not fire `wordiness` or `synonym_pair`)
+> *She told me she had had a difficult week before the announcement landed.*
+Reason: `had had` is correct past-perfect grammar, not redundancy.
+
+**24. NEG: clean strong prose, no wordiness** (must not fire `wordiness`, `weak_adverb`, or `weak_verb`)
+> *We ship every Friday. The team trusts the build. Outages are rare.*
+Reason: short, direct, no fluff, no weak verbs or adverbs.
+
+**25. NEG: who used correctly** (must not fire `who_vs_that`)
+> *The candidates who applied last quarter performed best in the panel review.*
+Reason: the rule applies only when `that` is misused for people. Here `who` is correct.
+
+### Document positives — 4 cases
+
+Each runs through Pass B and must produce a document-level observation with the named ruleId.
+
+**26. doc: BLUF — buried lede pitch** (must fire `bluf`)
+> *I am the co-founder of BorrowBear, a peer-to-peer rental marketplace that is scaling at 100% month-over-month and recently passed 10,000 users. The goal is to become the Airbnb of everything, where people can rent items temporarily and lenders can generate substantial passive income by sharing items they already own. Do you have 20 minutes for me to tell you more?*
+Reason: the headline value ("Airbnb of everything", high growth, big TAM) is buried behind the founder's role.
+
+**27. doc: audience missing** (must fire `audience`)
+> *Our product solves a real problem. We have many features. We are different from competitors. We would love to discuss the opportunity further. Please let us know if you are interested in moving forward.*
+Reason: no reader is named. "Our product", "a real problem", "the opportunity" — could be addressed to anyone.
+
+**28. doc: redundancy across paragraphs** (must fire `redundancy`)
+> *Our platform helps small teams ship faster by removing friction in the deploy pipeline. The core insight: most outages come from human steps, not code.*
+>
+> *Small teams move slower than they should because deploys involve too many manual steps. Each manual step is a chance for human error. Our platform automates those steps.*
+>
+> *The payoff: small teams ship without fear. They stop dreading Friday afternoons. The platform handles the human-error parts so engineers can focus on the work.*
+Reason: paragraphs 1 and 2 make the same claim ("manual steps cause errors, platform automates"); paragraph 3 is the only one with a new beat.
+
+**29. doc: missing call to action** (must fire `happy_ending`)
+> *Our analysis suggests the new pricing tier should land between $39 and $59 per seat per month. We modeled three scenarios. In all three, contribution margin improves materially. Adoption looks healthy in the willingness-to-pay survey. There are some open questions about enterprise carve-outs and whether to bundle the audit log.*
+Reason: ends on open questions instead of a recommendation, a date, or an ask.
+
 ## How to add a fixture
 
 1. Open `evals/fixtures/ww-before-after.json`.
