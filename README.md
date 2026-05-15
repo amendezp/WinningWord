@@ -22,14 +22,17 @@ Open <http://localhost:3000>.
 
 ## Providers
 
-WinningWord can route analysis through either:
+WinningWord can route analysis through three modes, swapped at runtime via the top-bar toggle:
 
-- **Anthropic Claude** (default) — autoregressive. Haiku 4.5 for paragraph coaching, Sonnet 4.6 for whole-document analysis.
-- **Inception Labs Mercury** — diffusion. Same prompts and tool schemas, OpenAI-compatible endpoint.
+| Mode | Pass A (paragraph) | Pass B (document) | Why |
+|---|---|---|---|
+| **Hybrid** (default) | Claude Haiku 4.5 | Mercury 2 | Best of both — eval-backed: Claude is 100% on every paragraph rule, Mercury is 100% on every document rule and ~8× faster. |
+| Claude | Claude Haiku 4.5 | Claude Sonnet 4.6 | Highest accuracy across the board. Slower on document pass. |
+| Mercury | Mercury 2 | Mercury 2 | Fastest. ~8× speed-up but only 72% paragraph pass rate (see `evals/README.md`). |
 
-A toggle in the top bar swaps between them at runtime. Selection persists in `localStorage`. Every suggestion card and document observation shows the latency it took to produce — useful for comparing the two models live as you write.
+Selection persists in `localStorage`. Every suggestion card and document observation shows the latency it took to produce — comparison is visible as you write.
 
-To use Mercury, get an `INCEPTION_API_KEY` from <https://platform.inceptionlabs.ai> (10M free tokens on signup) and paste it into `.env.local` alongside the Anthropic key.
+To use Mercury (or Hybrid), get an `INCEPTION_API_KEY` from <https://platform.inceptionlabs.ai> (10M free tokens on signup) and paste it into `.env.local` alongside the Anthropic key.
 
 ### Gotcha: shell env vars shadow `.env.local`
 

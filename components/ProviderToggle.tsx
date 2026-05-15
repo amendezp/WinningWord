@@ -1,21 +1,33 @@
 "use client";
 
-import { useProviderStore } from "@/lib/store/providerPreference";
-import type { ProviderId } from "@/lib/analyze/providers";
+import { useProviderStore, type ProviderMode } from "@/lib/store/providerPreference";
 
-const OPTIONS: Array<{ id: ProviderId; label: string; title: string }> = [
-  { id: "anthropic", label: "Claude", title: "Anthropic Claude (autoregressive)" },
-  { id: "inception", label: "Mercury", title: "Inception Labs Mercury (diffusion)" },
+const OPTIONS: Array<{ id: ProviderMode; label: string; title: string }> = [
+  {
+    id: "anthropic",
+    label: "Claude",
+    title: "Anthropic Claude on both passes (highest accuracy)",
+  },
+  {
+    id: "hybrid",
+    label: "Hybrid",
+    title:
+      "Best of both: Claude for paragraph coaching (100% accuracy), Mercury for whole-document review (8× faster)",
+  },
+  {
+    id: "inception",
+    label: "Mercury",
+    title: "Inception Labs Mercury on both passes (fastest, lower paragraph accuracy)",
+  },
 ];
 
 /**
- * Two-option pill in the top bar to switch between the autoregressive
- * (Anthropic) and diffusion (Inception Mercury) providers. Persisted to
- * localStorage. Latency badges on suggestion cards make the comparison
- * visible as the user writes.
+ * Three-option pill in the top bar. Default is "Hybrid" — evals show it's
+ * the strict best of both: same accuracy as Claude on every rule, with
+ * Mercury's 8× speedup on the document pass.
  */
 export function ProviderToggle() {
-  const providerId = useProviderStore((s) => s.providerId);
+  const providerMode = useProviderStore((s) => s.providerMode);
   const setProvider = useProviderStore((s) => s.setProvider);
 
   return (
@@ -25,7 +37,7 @@ export function ProviderToggle() {
       className="flex items-center rounded-full border border-stone-300 bg-paper p-0.5 text-xs"
     >
       {OPTIONS.map((opt) => {
-        const active = providerId === opt.id;
+        const active = providerMode === opt.id;
         return (
           <button
             key={opt.id}
