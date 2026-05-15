@@ -41,7 +41,7 @@ export const paragraphTool: Anthropic.Tool = {
       praises: {
         type: "array",
         description:
-          "Moments of *genuinely strong* writing. Be stingy — most paragraphs deserve zero. Praise only prose that would make a reader stop and notice.",
+          "Sentences that match one or more of the praise rules' concrete linguistic signals (short + no hedges → punchy_brevity; strong monosyllabic main verb → strong_short_verb; measurable/sensory/named detail → vivid_specificity). Treat praise as a checklist match, not a vibes judgement.",
         items: {
           type: "object",
           properties: {

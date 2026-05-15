@@ -1,14 +1,17 @@
 /**
  * Eval runner.
  *
- *   ANTHROPIC_API_KEY=... npm run eval
+ *   npm run eval
  *
  * Calls Anthropic directly (not via the Next.js route — keeps this runnable
- * without a running dev server). Asserts that each fixture's Before text
- * triggers at least one flag with a `ruleId` in the fixture's `ruleIds` set.
+ * without a running dev server). Uses the SAME model split as production:
+ *   - paragraph fixtures → Haiku 4.5 (matches /api/analyze-paragraph)
+ *   - document fixtures  → Sonnet 4.6 (matches /api/analyze-document)
  *
- * For paragraph-scope fixtures, also asserts the flagged phrase appears in
- * `expectedAnyOf` when provided.
+ * Fixture types:
+ *   - "paragraph" / "document"  — positive case. The named rule must fire.
+ *   - "paragraph_negative"      — text that should produce ZERO flags of the
+ *                                 named ruleIds (false-positive guard).
  */
 
 import { readFileSync } from "node:fs";
@@ -26,6 +29,13 @@ type ParagraphFixture = {
   expectedAnyOf?: string[];
 };
 
+type ParagraphNegativeFixture = {
+  name: string;
+  ruleIds: string[]; // rules that must NOT fire on this text
+  scope: "paragraph_negative";
+  before: string;
+};
+
 type DocumentFixture = {
   name: string;
   ruleIds: string[];
@@ -33,48 +43,84 @@ type DocumentFixture = {
   before: string;
 };
 
-type Fixture = ParagraphFixture | DocumentFixture;
+type Fixture = ParagraphFixture | ParagraphNegativeFixture | DocumentFixture;
 
-const MODEL = process.env.WW_EVAL_MODEL ?? "claude-sonnet-4-5";
+const PARAGRAPH_MODEL = process.env.WW_PARAGRAPH_MODEL ?? "claude-haiku-4-5-20251001";
+const DOCUMENT_MODEL = process.env.WW_DOCUMENT_MODEL ?? "claude-sonnet-4-6";
 
-async function runParagraphFixture(
+async function paragraphAnalysis(
   client: Anthropic,
-  f: ParagraphFixture
-): Promise<{ pass: boolean; detail: string; raw: ParagraphFeedback }> {
+  text: string
+): Promise<ParagraphFeedback> {
   const resp = await client.messages.create({
-    model: MODEL,
+    model: PARAGRAPH_MODEL,
     max_tokens: 1024,
     system: PARAGRAPH_SYSTEM_PROMPT,
     tools: [paragraphTool],
     tool_choice: { type: "tool", name: "report_paragraph_feedback" },
     messages: [
-      { role: "user", content: `Focus paragraph (analyze ONLY this paragraph):\n\n${f.before}` },
+      { role: "user", content: `Focus paragraph (analyze ONLY this paragraph):\n\n${text}` },
     ],
   });
   const toolUse = resp.content.find((b): b is Anthropic.Messages.ToolUseBlock => b.type === "tool_use");
-  const raw = (toolUse?.input as ParagraphFeedback) ?? { issues: [], praises: [] };
+  return (toolUse?.input as ParagraphFeedback) ?? { issues: [], improvements: [], praises: [] };
+}
 
-  const hitRule = raw.issues.find((i) => f.ruleIds.includes(i.ruleId));
-  if (!hitRule) {
+async function runParagraphFixture(
+  client: Anthropic,
+  f: ParagraphFixture
+): Promise<{ pass: boolean; detail: string; raw: ParagraphFeedback }> {
+  const raw = await paragraphAnalysis(client, f.before);
+  // Check ALL three tiers — a praise fixture's ruleId lives in raw.praises,
+  // not in issues/improvements. Earlier versions of this runner only looked
+  // at issues+improvements, which silently failed every praise fixture.
+  const allFlags = [
+    ...(raw.issues ?? []),
+    ...(raw.improvements ?? []),
+    ...(raw.praises ?? []),
+  ];
+  const hit = allFlags.find((i) => f.ruleIds.includes(i.ruleId));
+  if (!hit) {
     return {
       pass: false,
-      detail: `expected one of [${f.ruleIds.join(", ")}], got [${raw.issues.map((i) => i.ruleId).join(", ") || "none"}]`,
+      detail: `expected one of [${f.ruleIds.join(", ")}], got [${allFlags.map((i) => i.ruleId).join(", ") || "none"}]`,
       raw,
     };
   }
   if (f.expectedAnyOf && f.expectedAnyOf.length) {
     const phraseOk = f.expectedAnyOf.some((p) =>
-      raw.issues.some((i) => i.phrase.toLowerCase().includes(p.toLowerCase()))
+      allFlags.some((i) => i.phrase.toLowerCase().includes(p.toLowerCase()))
     );
     if (!phraseOk) {
       return {
         pass: false,
-        detail: `rule matched but phrase missed: got "${hitRule.phrase}", expected one of [${f.expectedAnyOf.join(", ")}]`,
+        detail: `rule matched but phrase missed: got "${hit.phrase}", expected one of [${f.expectedAnyOf.join(", ")}]`,
         raw,
       };
     }
   }
-  return { pass: true, detail: `flagged "${hitRule.phrase}" as ${hitRule.ruleId}`, raw };
+  return { pass: true, detail: `flagged "${hit.phrase}" as ${hit.ruleId}`, raw };
+}
+
+async function runParagraphNegativeFixture(
+  client: Anthropic,
+  f: ParagraphNegativeFixture
+): Promise<{ pass: boolean; detail: string; raw: ParagraphFeedback }> {
+  const raw = await paragraphAnalysis(client, f.before);
+  const allFlags = [...(raw.issues ?? []), ...(raw.improvements ?? [])];
+  const offender = allFlags.find((i) => f.ruleIds.includes(i.ruleId));
+  if (offender) {
+    return {
+      pass: false,
+      detail: `false positive: "${offender.phrase}" flagged as ${offender.ruleId} (clean text should produce no such flag)`,
+      raw,
+    };
+  }
+  return {
+    pass: true,
+    detail: `no false positives (total flags returned: ${allFlags.length})`,
+    raw,
+  };
 }
 
 async function runDocumentFixture(
@@ -82,7 +128,7 @@ async function runDocumentFixture(
   f: DocumentFixture
 ): Promise<{ pass: boolean; detail: string; raw: DocumentFeedback }> {
   const resp = await client.messages.create({
-    model: MODEL,
+    model: DOCUMENT_MODEL,
     max_tokens: 1500,
     system: DOCUMENT_SYSTEM_PROMPT,
     tools: [documentTool],
@@ -113,22 +159,24 @@ async function main() {
     readFileSync(path.join(__dirname, "fixtures/ww-before-after.json"), "utf-8")
   );
 
-  console.log(`Running ${fixtures.length} fixtures against ${MODEL}\n`);
+  console.log(`Running ${fixtures.length} fixtures`);
+  console.log(`  paragraph model: ${PARAGRAPH_MODEL}`);
+  console.log(`  document model:  ${DOCUMENT_MODEL}\n`);
 
-  const results: Array<{ name: string; pass: boolean; detail: string; ruleIds: string[] }> = [];
+  const results: Array<{ name: string; pass: boolean; detail: string; ruleIds: string[]; scope: string }> = [];
   for (const f of fixtures) {
-    process.stdout.write(`  ${f.name.padEnd(40)} `);
+    process.stdout.write(`  [${f.scope.padEnd(20)}] ${f.name.padEnd(40)} `);
     try {
-      const out =
-        f.scope === "paragraph"
-          ? await runParagraphFixture(client, f)
-          : await runDocumentFixture(client, f);
+      let out: { pass: boolean; detail: string };
+      if (f.scope === "paragraph") out = await runParagraphFixture(client, f);
+      else if (f.scope === "paragraph_negative") out = await runParagraphNegativeFixture(client, f);
+      else out = await runDocumentFixture(client, f);
       const mark = out.pass ? "\x1b[32m✓\x1b[0m" : "\x1b[31m✗\x1b[0m";
       console.log(`${mark}  ${out.detail}`);
-      results.push({ name: f.name, pass: out.pass, detail: out.detail, ruleIds: f.ruleIds });
+      results.push({ name: f.name, pass: out.pass, detail: out.detail, ruleIds: f.ruleIds, scope: f.scope });
     } catch (err) {
       console.log(`\x1b[31m✗\x1b[0m  ${(err as Error).message}`);
-      results.push({ name: f.name, pass: false, detail: (err as Error).message, ruleIds: f.ruleIds });
+      results.push({ name: f.name, pass: false, detail: (err as Error).message, ruleIds: f.ruleIds, scope: f.scope });
     }
   }
 
@@ -145,7 +193,8 @@ async function main() {
   }
   for (const [rid, { pass, total }] of [...byRule.entries()].sort()) {
     const pct = Math.round((pass / total) * 100);
-    console.log(`  ${rid.padEnd(22)} ${pass}/${total}  ${pct}%`);
+    const color = pct === 100 ? "\x1b[32m" : pct >= 50 ? "\x1b[33m" : "\x1b[31m";
+    console.log(`  ${rid.padEnd(22)} ${pass}/${total}  ${color}${pct}%\x1b[0m`);
   }
 
   const passed = results.filter((r) => r.pass).length;

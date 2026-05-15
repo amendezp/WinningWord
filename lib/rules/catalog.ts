@@ -14,13 +14,14 @@ export const RULES: Rule[] = [
     scope: "paragraph",
     highlightKind: "issue",
     name: "Wordiness",
-    shortDesc: "Cut filler words and bloated phrases.",
+    shortDesc: "Cut filler phrases that add length without meaning.",
     longDesc:
-      "Eliminate words that add length without meaning. Common offenders: 'being able to', 'currently', 'in the process of', 'in the event that', 'at this point in time', 'due to the fact that'. If a phrase can be shortened or deleted without losing meaning, do it.",
+      "Flag specific filler phrases worth cutting. Targets: 'being able to', 'currently', 'in the process of', 'in the event that', 'at this point in time', 'due to the fact that', 'with regard to', 'in order to'. Do NOT flag legitimate grammatical repetition like 'had had', 'that that', 'is is' — those are correct English, not wordiness.",
     examples: [
       { before: "We are in the process of investigating.", after: "We are investigating." },
       { before: "I am currently working for Google.", after: "I work at Google." },
       { before: "In the event that it rains, the picnic is cancelled.", after: "If it rains, the picnic is cancelled." },
+      { before: "She had had a difficult week.", note: "Not wordiness — 'had had' is past perfect of 'have'. Leave it alone." },
     ],
   },
   {
@@ -150,16 +151,25 @@ export const RULES: Rule[] = [
   },
 
   // ============= PARAGRAPH-SCOPED PRAISE RULES =============
+  // Each praise rule lists CONCRETE LINGUISTIC SIGNALS the model can detect.
+  // Vibes ("memorable", "engaging") don't reliably trigger; specifics do.
   {
     id: "vivid_specificity",
     scope: "paragraph",
     highlightKind: "praise",
     name: "Vivid, specific detail",
-    shortDesc: "Concrete imagery the reader can picture.",
+    shortDesc: "Concrete sensory or numeric detail the reader can picture.",
     longDesc:
-      "Picture your favorite movie scene. Describe it in words.' Sensory or numeric detail makes prose memorable — applaud when the writer brings something to life.",
+      "Praise a phrase that swaps an abstraction for a specific image the reader can see. Signals: a measurement ('12oz', '70%', 'three minutes'), a brand or proper noun, a sensory adjective ('refreshing', 'gritty', 'metallic'), or a recognizable comparison ('like coconut water', 'the color of dry rust'). 'A refreshing drink' is abstract; '12oz beverage reminiscent of coconut water' is vivid.",
     examples: [
-      { before: "Drink your daily prenatal vitamins in a light, refreshing 12oz beverage reminiscent of coconut water." },
+      {
+        before: "Drink your daily prenatal vitamins in a light, refreshing 12oz beverage reminiscent of coconut water.",
+        note: "'12oz' + 'reminiscent of coconut water' — measurable + recognizable comparison",
+      },
+      {
+        before: "The fire gutted the warehouse in eleven minutes, leaving steel beams the color of dry rust.",
+        note: "numeric ('eleven minutes') + sensory ('color of dry rust')",
+      },
     ],
   },
   {
@@ -167,11 +177,13 @@ export const RULES: Rule[] = [
     scope: "paragraph",
     highlightKind: "praise",
     name: "Strong, short verb",
-    shortDesc: "Punchy, monosyllabic verbs.",
+    shortDesc: "A monosyllabic action verb that carries the sentence.",
     longDesc:
-      "Verbs like 'crush', 'shred', 'spark', 'gut', 'land' carry more force than their corporate counterparts. Celebrate when the writer reaches for the strong word.",
+      "Praise when the writer uses a punchy one-syllable verb where a corporate paraphrase would have used three syllables and an auxiliary. Detect: a single-word past or present verb of 4–6 letters doing the main work, no helping verb. Look for: gut, crush, kill, spark, land, shred, bend, snap, smash, sink, dwarf, burn, drag, slash, hit, hold, jolt, rip, tear, swing. Praise the verb, not the whole sentence.",
     examples: [
-      { before: "Diamonds aren't forever.", note: "Three words. Whole pitch." },
+      { before: "The fire gutted the warehouse.", note: "'gutted' — 4 chars, no helper" },
+      { before: "Diamonds aren't forever.", note: "'aren't' as the load-bearer; 3-word sentence" },
+      { before: "The outage crushed Q3 revenue.", note: "'crushed' beats 'severely impacted'" },
     ],
   },
   {
@@ -179,11 +191,14 @@ export const RULES: Rule[] = [
     scope: "paragraph",
     highlightKind: "praise",
     name: "Punchy brevity",
-    shortDesc: "A sentence that says it in fewer words than seemed possible.",
+    shortDesc: "A standalone sentence ≤8 words that lands without qualifiers.",
     longDesc:
-      "The Miniskirt Rule: long enough to cover the basics, short enough to keep it interesting. Sentences that pass the 'one phrase' test deserve celebration.",
+      "Praise when a sentence is short enough to count on one hand (≤8 words) AND contains no hedge words ('perhaps', 'maybe', 'somewhat', 'kind of', 'arguably'). Often a one-word sentence ('Brilliant.'), a tagline ('Diamonds aren't forever.'), or a punch ending after a longer setup. The brevity is the impact.",
     examples: [
-      { before: "Personalized algorithms will make us shallow, narrow and small by exploiting our biases — all to make others rich. There's a solution." },
+      { before: "Brilliant!", note: "single-word punch" },
+      { before: "Diamonds aren't forever.", note: "3-word tagline" },
+      { before: "There's a solution.", note: "punch ending after a longer setup" },
+      { before: "Write on.", note: "two-word close" },
     ],
   },
 
@@ -210,11 +225,14 @@ export const RULES: Rule[] = [
     name: "Audience clarity",
     shortDesc: "Who is this for? What do they care about?",
     longDesc:
-      "Winning Writing RULE ONE. Before you write, identify the audience and what result you want from them. If the document doesn't betray a clear audience, flag it.",
+      "Winning Writing RULE ONE. The reader's role, pain, or stake should be obvious in the first paragraph. If the doc doesn't name a specific audience — by role, industry, or named pain — flag it. Generic 'we' / 'our product' / 'the user' without a concrete reader signals an unfocused pitch.",
     examples: [
       {
-        before: "Generic vendor pitch addressed to no one.",
-        after: "A pitch that names the target reader's pain in sentence one.",
+        before:
+          "Our product solves a real problem. We have many features. We are different from competitors. We would love to discuss the opportunity further.",
+        after:
+          "Engineering leaders shipping more than once a day: our deploy pipeline removes the manual approval step you currently chase across three Slack channels.",
+        note: "After version names the reader (engineering leaders), their context (>1 deploy/day), and the specific pain (manual approvals across Slack).",
       },
     ],
   },
@@ -225,9 +243,19 @@ export const RULES: Rule[] = [
     name: "One-sentence test",
     shortDesc: "If you boiled it down to one sentence, what would it say?",
     longDesc:
-      "Winning Writing RULE TWO. Before writing, you should be able to state the core idea in one phrase, sentence, or paragraph. The model attempts this and offers it back so you can compare against what you actually wrote.",
+      "Winning Writing RULE TWO. The whole document should reduce to one sentence. The model attempts that reduction in the 'If we boiled it down' summary so you can compare it against what you actually wrote. If the reduction doesn't match your intent, your prose is hiding the point.",
     examples: [
-      { before: "Long meandering pitch.", after: "Diamonds Aren't Forever." },
+      {
+        before:
+          "A four-paragraph product pitch describing features, market dynamics, competitive moats, and growth metrics without a single clear claim.",
+        after: "Diamonds Aren't Forever.",
+        note: "If you can't reduce your doc this hard, the core idea isn't actually clear in your own head.",
+      },
+      {
+        before:
+          "We discuss several factors that influence engagement, including notification cadence, feed ranking, and onboarding friction. The analysis suggests there are trade-offs in each.",
+        after: "Two onboarding screens kill 40% of signups. Cut both.",
+      },
     ],
   },
   {
@@ -237,9 +265,14 @@ export const RULES: Rule[] = [
     name: "Repetition across paragraphs",
     shortDesc: "Same idea twice in different paragraphs — cut one.",
     longDesc:
-      "Document-level wordiness. If two paragraphs make the same point, the second weakens the first.",
+      "Document-level wordiness. If two paragraphs make the same point in different words, the second weakens the first. Flag when ≥2 paragraphs share the same core claim, even if phrased differently.",
     examples: [
-      { before: "Paragraph 2 restating what paragraph 1 already said.", after: "Cut paragraph 2 or merge them." },
+      {
+        before:
+          "Our platform automates deploys. The core insight: most outages come from human steps, not code.\n\nSmall teams move slower than they should because deploys involve too many manual steps. Each manual step is a chance for human error.\n\nThe payoff: small teams ship without fear. The platform handles the human-error parts.",
+        after:
+          "Cut paragraph 2 or fold it into 1 — both say 'manual steps cause errors, we automate them'. Paragraph 3 is the only one with a new beat (the payoff).",
+      },
     ],
   },
   {
@@ -249,8 +282,16 @@ export const RULES: Rule[] = [
     name: "Happy ending / call to action",
     shortDesc: "End with resolution or an ask — not still mired in trouble.",
     longDesc:
-      "Better to show yourself overcoming something than still stuck. For a pitch, end with the ask. For a story, end with what you learned or how it resolved.",
-    examples: [],
+      "Better to show yourself overcoming something than still stuck. For a pitch, end with the ask. For a story, end with what you learned or how it resolved. Flag when the final paragraph opens new questions, dwells on unresolved problems, or trails off without an explicit next step.",
+    examples: [
+      {
+        before:
+          "Our analysis suggests the new pricing tier should land between $39 and $59 per seat. We modeled three scenarios. Adoption looks healthy in the survey. There are some open questions about enterprise carve-outs and whether to bundle the audit log.",
+        after:
+          "Recommend $49/seat. We'll ship the public tier Thursday and defer enterprise carve-outs to a separate review next month. Decision needed by EOW.",
+        note: "After ends with a concrete recommendation, a date, and the ask.",
+      },
+    ],
   },
 ];
 

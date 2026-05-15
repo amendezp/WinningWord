@@ -14,12 +14,28 @@
     "expectedAnyOf": ["In the event that"]
   },
   {
+    "name": "at this point in time",
+    "ruleIds": ["wordiness"],
+    "scope": "paragraph",
+    "before": "At this point in time, the team has not yet decided which vendor to choose for the renovation project.",
+    "expectedAnyOf": ["At this point in time"]
+  },
+
+  {
     "name": "successfully got",
     "ruleIds": ["weak_adverb"],
     "scope": "paragraph",
     "before": "After months of work, I successfully got the scholarship and absolutely crushed the interview.",
     "expectedAnyOf": ["successfully", "absolutely"]
   },
+  {
+    "name": "completely crushed it",
+    "ruleIds": ["weak_adverb"],
+    "scope": "paragraph",
+    "before": "Our small team completely crushed the quarterly target and totally smashed every retention milestone.",
+    "expectedAnyOf": ["completely", "totally"]
+  },
+
   {
     "name": "incredibly smart -> brilliant",
     "ruleIds": ["powerful_word"],
@@ -28,12 +44,28 @@
     "expectedAnyOf": ["incredibly smart"]
   },
   {
-    "name": "utilize -> use",
+    "name": "extremely important -> crucial",
+    "ruleIds": ["powerful_word"],
+    "scope": "paragraph",
+    "before": "It is extremely important that we ship this on time for an especially unusual reason.",
+    "expectedAnyOf": ["extremely important", "especially unusual"]
+  },
+
+  {
+    "name": "utilize + facilitate -> use + help",
     "ruleIds": ["weak_verb"],
     "scope": "paragraph",
     "before": "We will utilize the new framework to facilitate faster onboarding for all new hires next quarter.",
     "expectedAnyOf": ["utilize", "facilitate"]
   },
+  {
+    "name": "incentivize -> encourage",
+    "ruleIds": ["weak_verb"],
+    "scope": "paragraph",
+    "before": "We must incentivize the sales team and operationalize the new pricing model before the end of Q4.",
+    "expectedAnyOf": ["incentivize", "operationalize"]
+  },
+
   {
     "name": "inspiring and constructive",
     "ruleIds": ["synonym_pair"],
@@ -42,6 +74,14 @@
     "expectedAnyOf": ["inspiring and constructive"]
   },
   {
+    "name": "rare and extraordinary",
+    "ruleIds": ["synonym_pair"],
+    "scope": "paragraph",
+    "before": "She is a rare and extraordinary talent who joined us last summer from a clear and obvious rival.",
+    "expectedAnyOf": ["rare and extraordinary", "clear and obvious"]
+  },
+
+  {
     "name": "ecommerce space",
     "ruleIds": ["useless_jargon"],
     "scope": "paragraph",
@@ -49,19 +89,37 @@
     "expectedAnyOf": ["space"]
   },
   {
+    "name": "crisis situation",
+    "ruleIds": ["useless_jargon"],
+    "scope": "paragraph",
+    "before": "When the outage hit, we treated it as a crisis situation and rolled out our action plan within an hour.",
+    "expectedAnyOf": ["situation", "action plan"]
+  },
+
+  {
     "name": "alumni that donate",
     "ruleIds": ["who_vs_that"],
     "scope": "paragraph",
     "before": "GSB alumni that donate to the school have a profound effect on the next generation of students.",
     "expectedAnyOf": ["that"]
   },
+
   {
-    "name": "dangling modifier",
+    "name": "dangling modifier (renowned investor)",
     "ruleIds": ["dangling_modifier"],
     "scope": "paragraph",
     "before": "As a renowned and savvy investor, I would love to spend 30 minutes with you to hear your feedback regarding my investment thesis.",
     "expectedAnyOf": ["As a renowned and savvy investor"]
   },
+
+  {
+    "name": "destructive phrasing — this is boring",
+    "ruleIds": ["destructive_phrasing"],
+    "scope": "paragraph",
+    "before": "This presentation is boring and the analysis is irrational.",
+    "expectedAnyOf": ["boring", "irrational"]
+  },
+
   {
     "name": "progressive -ing verb",
     "ruleIds": ["ing_verb"],
@@ -70,9 +128,79 @@
     "expectedAnyOf": ["is leading", "is preparing"]
   },
   {
-    "name": "BLUF — buried lede pitch",
+    "name": "progressive -ing verb 2",
+    "ruleIds": ["ing_verb"],
+    "scope": "paragraph",
+    "before": "She is mentoring three new hires while she is rewriting the onboarding handbook.",
+    "expectedAnyOf": ["is mentoring", "is rewriting"]
+  },
+
+  {
+    "name": "praise: punchy brevity",
+    "ruleIds": ["punchy_brevity"],
+    "scope": "paragraph",
+    "before": "Diamonds aren't forever."
+  },
+  {
+    "name": "praise: strong short verb",
+    "ruleIds": ["strong_short_verb"],
+    "scope": "paragraph",
+    "before": "The fire gutted the warehouse. The owner crushed by debt watched it burn."
+  },
+  {
+    "name": "praise: vivid specificity",
+    "ruleIds": ["vivid_specificity"],
+    "scope": "paragraph",
+    "before": "Drink your daily prenatal vitamins in a light, refreshing 12oz beverage reminiscent of coconut water."
+  },
+
+  {
+    "name": "NEG: clean prose, no -ing flag",
+    "ruleIds": ["ing_verb"],
+    "scope": "paragraph_negative",
+    "before": "The team ships every Friday. We track three metrics: latency, errors, and revenue per request."
+  },
+  {
+    "name": "NEG: had had — genuine repetition",
+    "ruleIds": ["wordiness", "synonym_pair"],
+    "scope": "paragraph_negative",
+    "before": "She told me she had had a difficult week before the announcement landed."
+  },
+  {
+    "name": "NEG: clean strong prose, no wordiness",
+    "ruleIds": ["wordiness", "weak_adverb", "weak_verb"],
+    "scope": "paragraph_negative",
+    "before": "We ship every Friday. The team trusts the build. Outages are rare."
+  },
+  {
+    "name": "NEG: who used correctly — no who_vs_that",
+    "ruleIds": ["who_vs_that"],
+    "scope": "paragraph_negative",
+    "before": "The candidates who applied last quarter performed best in the panel review."
+  },
+
+  {
+    "name": "doc: BLUF — buried lede pitch",
     "ruleIds": ["bluf"],
     "scope": "document",
     "before": "I am the co-founder of BorrowBear, a peer-to-peer rental marketplace that is scaling at 100% month-over-month and recently passed 10,000 users. The goal is to become the Airbnb of everything, where people can rent items temporarily and lenders can generate substantial passive income by sharing items they already own. Do you have 20 minutes for me to tell you more?"
+  },
+  {
+    "name": "doc: audience missing",
+    "ruleIds": ["audience"],
+    "scope": "document",
+    "before": "Our product solves a real problem. We have many features. We are different from competitors. We would love to discuss the opportunity further. Please let us know if you are interested in moving forward."
+  },
+  {
+    "name": "doc: redundancy across paragraphs",
+    "ruleIds": ["redundancy"],
+    "scope": "document",
+    "before": "Our platform helps small teams ship faster by removing friction in the deploy pipeline. The core insight: most outages come from human steps, not code.\n\nSmall teams move slower than they should because deploys involve too many manual steps. Each manual step is a chance for human error. Our platform automates those steps.\n\nThe payoff: small teams ship without fear. They stop dreading Friday afternoons. The platform handles the human-error parts so engineers can focus on the work."
+  },
+  {
+    "name": "doc: missing call to action",
+    "ruleIds": ["happy_ending"],
+    "scope": "document",
+    "before": "Our analysis suggests the new pricing tier should land between $39 and $59 per seat per month. We modeled three scenarios. In all three, contribution margin improves materially. Adoption looks healthy in the willingness-to-pay survey. There are some open questions about enterprise carve-outs and whether to bundle the audit log."
   }
 ]

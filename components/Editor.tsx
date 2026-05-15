@@ -21,6 +21,7 @@ import { analyzeParagraph, analyzeDocument } from "@/lib/analyze/client";
 import { fnv1a } from "@/lib/util/hash";
 import { normalizeAdjacency } from "@/lib/util/normalizeAdjacency";
 import { SEED_HTML, SEED_PARAGRAPH_SUGGESTIONS } from "@/lib/seed";
+import { EditorToolbar } from "./EditorToolbar";
 
 const HighlightExt = Extension.create({
   name: "wwHighlight",
@@ -378,5 +379,12 @@ export function Editor() {
   // (We don't actually need to render anything from it — the plugin handles DOM classes.)
   void highlightPluginKey;
 
-  return <EditorContent editor={editor} />;
+  return (
+    <>
+      <div className="sticky top-0 z-10">
+        <EditorToolbar editor={editor} />
+      </div>
+      <EditorContent editor={editor} />
+    </>
+  );
 }
