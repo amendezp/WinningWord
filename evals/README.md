@@ -26,23 +26,23 @@ Output: per-fixture ✓/✗ with latency, per-rule pass-rate table, mean/p50/p95
 | `paragraph_negative` | The named rule **must not** fire on the text (false-positive guard). Clean prose, "had had" as legitimate repetition, etc. |
 | `document` | A whole-doc rule (BLUF, audience, redundancy, happy_ending) must surface as an observation. |
 
-29 fixtures total today: 21 paragraph positives, 4 paragraph negatives, 4 document positives. Coverage spans all 17 rules in the catalog.
+33 fixtures total today: 21 paragraph positives, 4 paragraph negatives, 8 document positives. Coverage spans all 20 rules in the catalog.
 
 ## Provider comparison — current state
 
-Run 2026-05-15. Same 29 fixtures, same prompts, same tool schemas; only the model provider differs.
+Run 2026-05-19, after adding `weak_hook` and `weak_conclusion` (content-level structural rules). Same 33 fixtures, same prompts, same tool schemas; only the model provider differs.
 
 | Metric | Anthropic Claude | Inception Mercury 2 |
 |---|---|---|
-| **Overall pass rate** | **29/29 (100%)** | **21/29 (72%)** |
-| Paragraph mean latency | 9,661 ms | **1,378 ms** |
-| Paragraph p50 latency | 11,781 ms | **1,425 ms** |
-| Paragraph p95 latency | 13,128 ms | **2,025 ms** |
-| Document mean latency | 8,427 ms | **980 ms** |
-| Document p50 latency | 8,128 ms | **1,065 ms** |
-| Document p95 latency | 10,752 ms | **1,093 ms** |
+| **Overall pass rate** | **33/33 (100%)** | **22/33 (67%)** |
+| Paragraph mean latency | 9,710 ms | **2,460 ms** |
+| Paragraph p50 latency | 11,923 ms | **1,741 ms** |
+| Paragraph p95 latency | 13,006 ms | **5,181 ms** |
+| Document mean latency | 8,892 ms | **2,620 ms** |
+| Document p50 latency | 9,307 ms | **1,290 ms** |
+| Document p95 latency | 11,612 ms | **8,780 ms** |
 
-Mercury runs **~8× faster** end-to-end. Claude is the only one that passes every fixture.
+Mercury runs **~4–8× faster** end-to-end. Claude is the only one that passes every fixture, but Mercury matches Claude on every document-level rule (including the new `weak_hook` and `weak_conclusion`). That's why Hybrid routes Pass B to Mercury.
 
 ### Per-rule pass rates
 
@@ -62,6 +62,8 @@ Mercury runs **~8× faster** end-to-end. Claude is the only one that passes ever
 | useless_jargon | 2/2 (100%) | **0/2 (0%)** |
 | vivid_specificity | 1/1 (100%) | 1/1 (100%) |
 | weak_adverb | 3/3 (100%) | **2/3 (67%)** |
+| weak_conclusion *(new)* | 2/2 (100%) | 2/2 (100%) |
+| weak_hook *(new)* | 2/2 (100%) | 2/2 (100%) |
 | weak_verb | 3/3 (100%) | **2/3 (67%)** |
 | who_vs_that | 2/2 (100%) | 2/2 (100%) |
 | wordiness | 5/5 (100%) | **4/5 (80%)** |
@@ -272,6 +274,22 @@ Reason: paragraphs 1 and 2 make the same claim ("manual steps cause errors, plat
 **29. doc: missing call to action** (must fire `happy_ending`)
 > *Our analysis suggests the new pricing tier should land between $39 and $59 per seat per month. We modeled three scenarios. In all three, contribution margin improves materially. Adoption looks healthy in the willingness-to-pay survey. There are some open questions about enterprise carve-outs and whether to bundle the audit log.*
 Reason: ends on open questions instead of a recommendation, a date, or an ask.
+
+**30. doc: weak hook — throat clearing opener** (must fire `weak_hook`)
+> *Hope you're having a great Tuesday! I wanted to reach out about our new analytics platform, which I've been working on for the past six months. Our team has invested significant resources into building a product we're proud of. Today I'd like to walk you through what we've learned and where we're headed next.*
+Reason: four sentences of pleasantries before the reader learns why they should keep reading.
+
+**31. doc: weak hook — meta opening** (must fire `weak_hook`)
+> *This document discusses the rationale for our Q4 pricing changes. The team has been considering several options. Below, we outline each option and the relevant trade-offs. We welcome your feedback before the next planning cycle.*
+Reason: tells the reader what the doc is *about* instead of giving them the substance. Opens with a description of the document rather than the actual idea.
+
+**32. doc: weak conclusion — just stops** (must fire `weak_conclusion`)
+> *The migration plan is on track. Engineering, ops, and support have all been briefed. We will run a dry-run on staging next week. Database swaps are scheduled. The team has been briefed.*
+Reason: doc ends mid-thought with status updates and repeats itself ("The team has been briefed" twice). No takeaway, no rule for what happens when things go wrong.
+
+**33. doc: weak conclusion — recap only** (must fire `weak_conclusion`)
+> *Pricing matters. Audience matters. Distribution matters. As we've shown, all three need to align for a launch to succeed. In summary, we covered three factors that determine outcomes. Teams that ignore any one of them tend to underperform.*
+Reason: the ending re-summarizes the body instead of escalating to a sharp, memorable takeaway. "In summary…" is the tell.
 
 ## How to add a fixture
 

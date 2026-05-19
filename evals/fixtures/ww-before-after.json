@@ -202,5 +202,29 @@
     "ruleIds": ["happy_ending"],
     "scope": "document",
     "before": "Our analysis suggests the new pricing tier should land between $39 and $59 per seat per month. We modeled three scenarios. In all three, contribution margin improves materially. Adoption looks healthy in the willingness-to-pay survey. There are some open questions about enterprise carve-outs and whether to bundle the audit log."
+  },
+  {
+    "name": "doc: weak hook — throat clearing opener",
+    "ruleIds": ["weak_hook"],
+    "scope": "document",
+    "before": "Hope you're having a great Tuesday! I wanted to reach out about our new analytics platform, which I've been working on for the past six months. Our team has invested significant resources into building a product we're proud of. Today I'd like to walk you through what we've learned and where we're headed next."
+  },
+  {
+    "name": "doc: weak hook — meta opening",
+    "ruleIds": ["weak_hook"],
+    "scope": "document",
+    "before": "This document discusses the rationale for our Q4 pricing changes. The team has been considering several options. Below, we outline each option and the relevant trade-offs. We welcome your feedback before the next planning cycle."
+  },
+  {
+    "name": "doc: weak conclusion — just stops",
+    "ruleIds": ["weak_conclusion"],
+    "scope": "document",
+    "before": "The migration plan is on track. Engineering, ops, and support have all been briefed. We will run a dry-run on staging next week. Database swaps are scheduled. The team has been briefed."
+  },
+  {
+    "name": "doc: weak conclusion — recap only",
+    "ruleIds": ["weak_conclusion"],
+    "scope": "document",
+    "before": "Pricing matters. Audience matters. Distribution matters. As we've shown, all three need to align for a launch to succeed. In summary, we covered three factors that determine outcomes. Teams that ignore any one of them tend to underperform."
   }
 ]

@@ -293,6 +293,56 @@ export const RULES: Rule[] = [
       },
     ],
   },
+  {
+    id: "weak_hook",
+    scope: "document",
+    highlightKind: "issue",
+    name: "Weak hook",
+    shortDesc: "The opening doesn't make the reader want the second sentence.",
+    longDesc:
+      "A strong hook drops the reader straight into tension, stakes, a stat, a question, or an unexpected image. Flag openings that throat-clear, summarize the doc itself, name the writer's role first, or open with platitudes like 'Hope you're well.' Adjacent to BLUF but distinct: BLUF cares about the *substance* up front; the hook cares about whether the first sentence pulls the reader in.",
+    examples: [
+      {
+        before:
+          "Hope you're having a great Tuesday! I wanted to reach out about our new analytics platform, which I've been working on for the past six months.",
+        after:
+          "Eighty percent of your dashboards are answering questions no one asked. Here's a faster way to find the 20% that matter.",
+        note: "After opens with a punchy stat and an implied promise — the reader keeps reading.",
+      },
+      {
+        before:
+          "This document discusses the rationale for our Q4 pricing changes. The team has been considering several options.",
+        after:
+          "We're leaving $12M on the table at the current price. Q4 is when we take it back.",
+        note: "Stakes up front, no preamble.",
+      },
+    ],
+  },
+  {
+    id: "weak_conclusion",
+    scope: "document",
+    highlightKind: "issue",
+    name: "Weak conclusion",
+    shortDesc: "No synthesis or takeaway at the end — the doc just stops.",
+    longDesc:
+      "A strong conclusion either restates the core claim, names the one thing the reader should remember, or escalates from the body into a sharper version of the thesis. Flag endings that trail off mid-thought, summarize what the reader just read instead of landing a takeaway, or end on a bullet point. Different from `happy_ending` (about ASKs in pitches) — applies to essays, memos, stories. Every doc deserves a landing.",
+    examples: [
+      {
+        before:
+          "In summary, we covered three approaches to onboarding. Each has trade-offs depending on team size, growth rate, and tooling maturity.",
+        after:
+          "If you remember one thing: tiered onboarding only pays off above 50 hires a year. Below that, one path, ruthlessly maintained, beats three.",
+        note: "After lands a sharp, contrarian takeaway. Before merely recaps.",
+      },
+      {
+        before:
+          "The migration is on track. Database swaps are scheduled. The team has been briefed.",
+        after:
+          "The migration is on track. Database swaps Friday at 2am. If anything goes sideways, we roll back by 6am — no judgement call needed.",
+        note: "Before just stops. After ends with a concrete commitment and the rollback rule.",
+      },
+    ],
+  },
 ];
 
 export const PARAGRAPH_RULES = RULES.filter((r) => r.scope === "paragraph");
