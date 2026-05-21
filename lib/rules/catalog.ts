@@ -43,13 +43,19 @@ export const RULES: Rule[] = [
     scope: "paragraph",
     highlightKind: "issue",
     name: "Use a powerful word",
-    shortDesc: "Replace 'intensifier + ordinary word' with one strong word.",
+    shortDesc: "Replace two (or more) pale words with one strong word.",
     longDesc:
-      "'Incredibly smart' is 'brilliant'. 'Extremely important' is 'crucial'. 'Especially unusual' is 'rare'. One strong word beats two pale ones.",
+      "Kramon's drill: when a two- or three-word phrase can be replaced by a single strong word, do it. Three patterns to watch for: (1) INTENSIFIER + ADJECTIVE → one adjective ('incredibly smart' → 'brilliant'; 'extremely important' → 'crucial'; 'especially unusual' → 'rare'). (2) ADVERB + VERB or VERB + ADVERB → one strong verb ('dramatically cut' → 'slashed'; 'walk fast' → 'stride'; 'impact significantly' → 'reshape'; 'negatively affect' → 'hurt'; 'grown up significantly' → 'matured'). (3) VERB-PHRASE → one verb ('mitigating the impact' → 'cushioning'; 'make better' is handled by `weak_verb`).",
     examples: [
       { before: "She is incredibly smart.", after: "She's brilliant." },
       { before: "It's extremely important.", after: "It's crucial." },
       { before: "An especially unusual gem.", after: "A rare gem." },
+      { before: "We dramatically cut headcount.", after: "We slashed headcount." },
+      { before: "She walks fast across the lobby.", after: "She strides across the lobby." },
+      { before: "This will impact significantly the roadmap.", after: "This will reshape the roadmap." },
+      { before: "The outage will negatively affect revenue.", after: "The outage will hurt revenue." },
+      { before: "The team has grown up significantly this year.", after: "The team has matured this year." },
+      { before: "We're focused on mitigating the impact on customers.", after: "We're focused on cushioning the impact on customers." },
     ],
   },
   {
@@ -59,11 +65,14 @@ export const RULES: Rule[] = [
     name: "Weak verb (utilize, facilitate, make)",
     shortDesc: "Prefer simple verbs: use, help, start, improve, assure.",
     longDesc:
-      "Business jargon verbs sap energy. 'Utilize' is 'use'. 'Facilitate' is 'help'. 'Commence' is 'start'. 'Incentivize' is 'encourage'. 'Impact' as a verb is 'affect'. 'Implement' is often 'carry out'. Also avoid the verb 'make' when you can: 'make sure' → 'assure', 'make better' → 'improve'.",
+      "Business jargon verbs sap energy. 'Utilize' is 'use'. 'Facilitate' is 'help'. 'Commence' is 'start'. 'Incentivize' is 'encourage'. 'Impact' as a verb is 'affect'. 'Implement' is often 'carry out'. Also avoid the verb 'make' when you can: 'make sure' → 'assure', 'make better' → 'improve', 'make a decision' → 'decide', 'make use of' → 'use'. And drop 'be able to' — if you say 'I will be able to ship it', just say 'I will ship it' or 'I can ship it'.",
     examples: [
       { before: "We will utilize this framework.", after: "We will use this framework." },
       { before: "This will facilitate the process.", after: "This will help the process." },
       { before: "Make sure the door is locked.", after: "Assure the door is locked." },
+      { before: "We need to make better the onboarding flow.", after: "We need to improve the onboarding flow." },
+      { before: "I'll be able to do this by Friday.", after: "I'll do this by Friday." },
+      { before: "The team will be able to ship next week.", after: "The team will ship next week." },
     ],
   },
   {
@@ -84,13 +93,14 @@ export const RULES: Rule[] = [
     scope: "paragraph",
     highlightKind: "issue",
     name: "Useless jargon noun",
-    shortDesc: "Drop empty puffer nouns: 'space', 'situation', 'action plan'.",
+    shortDesc: "Drop empty puffer nouns: 'space', 'situation', 'action plan', 'action item'.",
     longDesc:
-      "'I work in the ecommerce space' — what does 'space' add? 'A crisis situation' — what other kind of crisis is there? 'An action plan' — as opposed to what? Cut.",
+      "'I work in the ecommerce space' — what does 'space' add? 'A crisis situation' — what other kind of crisis is there? 'An action plan' — as opposed to what? 'Action item' is just 'task'. Cut.",
     examples: [
       { before: "I work in the ecommerce space.", after: "I work in ecommerce." },
       { before: "This was a crisis situation.", after: "This was a crisis." },
       { before: "We have an action plan.", after: "We have a plan." },
+      { before: "Three action items came out of the meeting.", after: "Three tasks came out of the meeting." },
     ],
   },
   {

@@ -16,14 +16,14 @@ export type ProviderMode = "anthropic" | "inception" | "hybrid";
 const PREF_KEY = "ww:provider:v2"; // v2 — added "hybrid"
 
 function loadInitial(): ProviderMode {
-  if (typeof window === "undefined") return "hybrid";
+  if (typeof window === "undefined") return "anthropic";
   try {
     const raw = window.localStorage.getItem(PREF_KEY);
     if (raw === "anthropic" || raw === "inception" || raw === "hybrid") return raw;
   } catch {
     // fall through
   }
-  return "hybrid";
+  return "anthropic";
 }
 
 function save(mode: ProviderMode) {

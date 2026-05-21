@@ -26,9 +26,9 @@ WinningWord can route analysis through three modes, swapped at runtime via the t
 
 | Mode | Pass A (paragraph) | Pass B (document) | Why |
 |---|---|---|---|
-| **Hybrid** (default) | Claude Haiku 4.5 | Mercury 2 | Best of both — eval-backed: Claude is 100% on every paragraph rule, Mercury is 100% on every document rule and ~8× faster. |
-| Claude | Claude Haiku 4.5 | Claude Sonnet 4.6 | Highest accuracy across the board. Slower on document pass. |
-| Mercury | Mercury 2 | Mercury 2 | Fastest. ~8× speed-up but only 72% paragraph pass rate (see `evals/README.md`). |
+| **Claude** (default) | Claude Haiku 4.5 | Claude Sonnet 4.6 | Highest accuracy across the board (33/33 on the eval suite). Slower on document pass. |
+| Hybrid | Claude Haiku 4.5 | Mercury 2 | Best of both — eval-backed: Claude is 100% on every paragraph rule, Mercury is 100% on every document rule and ~4–8× faster. |
+| Mercury | Mercury 2 | Mercury 2 | Fastest end-to-end. ~67% paragraph pass rate — under-flags multi-issue paragraphs (see `evals/README.md`). |
 
 Selection persists in `localStorage`. Every suggestion card and document observation shows the latency it took to produce — comparison is visible as you write.
 

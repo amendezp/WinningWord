@@ -50,6 +50,34 @@
     "before": "It is extremely important that we ship this on time for an especially unusual reason.",
     "expectedAnyOf": ["extremely important", "especially unusual"]
   },
+  {
+    "name": "dramatically cut -> slashed",
+    "ruleIds": ["powerful_word"],
+    "scope": "paragraph",
+    "before": "Last quarter the team dramatically cut spending and grown up significantly in maturity.",
+    "expectedAnyOf": ["dramatically cut", "grown up significantly"]
+  },
+  {
+    "name": "walk fast -> stride",
+    "ruleIds": ["powerful_word"],
+    "scope": "paragraph",
+    "before": "She walks fast across the lobby every morning at exactly eight.",
+    "expectedAnyOf": ["walks fast"]
+  },
+  {
+    "name": "impact significantly / negatively affect",
+    "ruleIds": ["powerful_word"],
+    "scope": "paragraph",
+    "before": "The outage will impact significantly our customers and negatively affect revenue this quarter.",
+    "expectedAnyOf": ["impact significantly", "negatively affect"]
+  },
+  {
+    "name": "mitigating the impact -> cushioning",
+    "ruleIds": ["powerful_word"],
+    "scope": "paragraph",
+    "before": "Our focus this week is mitigating the impact on the enterprise customers affected by Tuesday's outage.",
+    "expectedAnyOf": ["mitigating the impact"]
+  },
 
   {
     "name": "utilize + facilitate -> use + help",
@@ -64,6 +92,20 @@
     "scope": "paragraph",
     "before": "We must incentivize the sales team and operationalize the new pricing model before the end of Q4.",
     "expectedAnyOf": ["incentivize", "operationalize"]
+  },
+  {
+    "name": "make better -> improve",
+    "ruleIds": ["weak_verb"],
+    "scope": "paragraph",
+    "before": "Our goal this quarter is to make better the onboarding flow and make sure churn drops below 5%.",
+    "expectedAnyOf": ["make better", "make sure"]
+  },
+  {
+    "name": "be able to -> just do it",
+    "ruleIds": ["weak_verb"],
+    "scope": "paragraph",
+    "before": "I'll be able to do this by Friday and the team will be able to ship next week.",
+    "expectedAnyOf": ["be able to do", "be able to ship"]
   },
 
   {
@@ -94,6 +136,13 @@
     "scope": "paragraph",
     "before": "When the outage hit, we treated it as a crisis situation and rolled out our action plan within an hour.",
     "expectedAnyOf": ["situation", "action plan"]
+  },
+  {
+    "name": "action items -> tasks",
+    "ruleIds": ["useless_jargon"],
+    "scope": "paragraph",
+    "before": "Three action items came out of yesterday's review and we'll close them by end of week.",
+    "expectedAnyOf": ["action items", "action item"]
   },
 
   {
