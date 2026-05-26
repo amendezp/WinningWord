@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ProviderToggle } from "./ProviderToggle";
 
 export function TopBar() {
   return (
@@ -8,7 +7,6 @@ export function TopBar() {
         WinningWord
       </Link>
       <nav className="flex items-center gap-5 text-sm text-stone-500">
-        <ProviderToggle />
         <Link href="/rules" className="hover:text-stone-900">
           Rules
         </Link>

@@ -15,7 +15,6 @@ import {
 } from "@/lib/decorations/highlightPlugin";
 import { forbiddenPlugin } from "@/lib/decorations/forbiddenPlugin";
 import { useSuggestionsStore } from "@/lib/store/suggestions";
-import { useProviderStore, deriveProviders } from "@/lib/store/providerPreference";
 import { shouldAnalyze } from "@/lib/trigger/sentenceTrigger";
 import { shouldRunDocumentPass } from "@/lib/trigger/documentTrigger";
 import { analyzeParagraph, analyzeDocument } from "@/lib/analyze/client";
@@ -55,9 +54,6 @@ export function Editor() {
   const focus = useSuggestionsStore((s) => s.focus);
   const pruneStale = useSuggestionsStore((s) => s.pruneStale);
   const paragraphSuggestions = useSuggestionsStore((s) => s.paragraphSuggestions);
-  const providerMode = useProviderStore((s) => s.providerMode);
-  // Pass A and Pass B may target different providers in "hybrid" mode.
-  const providers = deriveProviders(providerMode);
   const focusedUid = useSuggestionsStore((s) => s.focusedUid);
 
   // Per-paragraph trigger state, keyed by paragraph index.
@@ -112,7 +108,6 @@ export function Editor() {
         const resp = await analyzeParagraph({
           focusParagraph: paragraphText,
           documentBody: docBody,
-          provider: providers.paragraph,
           signal: ac.signal,
         });
         const { meta, ...feedback } = resp;
@@ -129,7 +124,7 @@ export function Editor() {
         }
       }
     };
-  }, [setPendingParagraph, upsertParagraph, providers.paragraph]);
+  }, [setPendingParagraph, upsertParagraph]);
 
   const runDocumentPass = useMemo(() => {
     return async (docBody: string) => {
@@ -143,7 +138,6 @@ export function Editor() {
       try {
         const resp = await analyzeDocument({
           documentBody: docBody,
-          provider: providers.document,
           signal: ac.signal,
         });
         const { meta, ...feedback } = resp;
@@ -160,7 +154,7 @@ export function Editor() {
         if (docInflightRef.current === ac) docInflightRef.current = null;
       }
     };
-  }, [setDocumentFeedback, setPendingDocument, providers.document]);
+  }, [setDocumentFeedback, setPendingDocument]);
 
   // One-time mount-seed: pre-populate suggestions + document feedback from
   // lib/seed.ts, then mark every initial paragraph as already-analyzed so the

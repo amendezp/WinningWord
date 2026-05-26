@@ -1,8 +1,7 @@
 /**
  * Eval runner.
  *
- *   npm run eval                        # Anthropic (default)
- *   WW_PROVIDER=inception npm run eval  # Mercury
+ *   npm run eval
  *
  * Routes through the same provider abstraction the API uses, so we test
  * what production actually runs.
@@ -15,7 +14,7 @@
 
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { getProvider, type ProviderId } from "../lib/analyze/providers";
+import { getProvider } from "../lib/analyze/providers";
 import type { ParagraphFeedback, DocumentFeedback } from "../lib/analyze/tools";
 
 type ParagraphFixture = {
@@ -42,12 +41,10 @@ type DocumentFixture = {
 
 type Fixture = ParagraphFixture | ParagraphNegativeFixture | DocumentFixture;
 
-const PROVIDER_ID = (process.env.WW_PROVIDER as ProviderId) ?? "anthropic";
-
 async function runParagraphFixture(
   f: ParagraphFixture
 ): Promise<{ pass: boolean; detail: string; latencyMs: number; raw: ParagraphFeedback }> {
-  const provider = getProvider(PROVIDER_ID);
+  const provider = getProvider();
   const { feedback: raw, meta } = await provider.analyzeParagraph({
     focusParagraph: f.before,
   });
@@ -89,7 +86,7 @@ async function runParagraphFixture(
 async function runParagraphNegativeFixture(
   f: ParagraphNegativeFixture
 ): Promise<{ pass: boolean; detail: string; latencyMs: number; raw: ParagraphFeedback }> {
-  const provider = getProvider(PROVIDER_ID);
+  const provider = getProvider();
   const { feedback: raw, meta } = await provider.analyzeParagraph({
     focusParagraph: f.before,
   });
@@ -114,7 +111,7 @@ async function runParagraphNegativeFixture(
 async function runDocumentFixture(
   f: DocumentFixture
 ): Promise<{ pass: boolean; detail: string; latencyMs: number; raw: DocumentFeedback }> {
-  const provider = getProvider(PROVIDER_ID);
+  const provider = getProvider();
   const { feedback: raw, meta } = await provider.analyzeDocument({
     documentBody: f.before,
   });
@@ -136,13 +133,13 @@ async function runDocumentFixture(
 }
 
 async function main() {
-  const provider = getProvider(PROVIDER_ID);
+  const provider = getProvider();
 
   const fixtures: Fixture[] = JSON.parse(
     readFileSync(path.join(__dirname, "fixtures/ww-before-after.json"), "utf-8")
   );
 
-  console.log(`Running ${fixtures.length} fixtures via ${PROVIDER_ID}`);
+  console.log(`Running ${fixtures.length} fixtures via ${provider.id}`);
   console.log(`  paragraph model: ${provider.paragraphModelName}`);
   console.log(`  document model:  ${provider.documentModelName}\n`);
 

@@ -20,19 +20,21 @@ npm run dev
 
 Open <http://localhost:3000>.
 
-## Providers
+## Models
 
-WinningWord can route analysis through three modes, swapped at runtime via the top-bar toggle:
+| Pass | Model | Why |
+|---|---|---|
+| Pass A — paragraph | Claude Haiku 4.5 | Fast, cheap, 100% on the paragraph eval suite. Fires after every 2–3 sentences. |
+| Pass B — whole document | Claude Sonnet 4.6 | Holistic reasoning over the full doc. Fires on idle or every 5 paragraph passes. |
 
-| Mode | Pass A (paragraph) | Pass B (document) | Why |
-|---|---|---|---|
-| **Claude** (default) | Claude Haiku 4.5 | Claude Sonnet 4.6 | Highest accuracy across the board (33/33 on the eval suite). Slower on document pass. |
-| Hybrid | Claude Haiku 4.5 | Mercury 2 | Best of both — eval-backed: Claude is 100% on every paragraph rule, Mercury is 100% on every document rule and ~4–8× faster. |
-| Mercury | Mercury 2 | Mercury 2 | Fastest end-to-end. ~67% paragraph pass rate — under-flags multi-issue paragraphs (see `evals/README.md`). |
+Override either via env (see `.env.example`):
 
-Selection persists in `localStorage`. Every suggestion card and document observation shows the latency it took to produce — comparison is visible as you write.
+```
+WW_PARAGRAPH_MODEL=claude-haiku-4-5-20251001
+WW_DOCUMENT_MODEL=claude-sonnet-4-6
+```
 
-To use Mercury (or Hybrid), get an `INCEPTION_API_KEY` from <https://platform.inceptionlabs.ai> (10M free tokens on signup) and paste it into `.env.local` alongside the Anthropic key.
+The provider abstraction in `lib/analyze/providers/` is set up so a second backend can be added later without touching the routes or the UI.
 
 ### Gotcha: shell env vars shadow `.env.local`
 
@@ -51,17 +53,16 @@ Edit `lib/rules/catalog.ts` — see `lib/rules/README.md`. The editor, prompts, 
 ## Running evals
 
 ```bash
-npm run eval                        # Anthropic (default)
-WW_PROVIDER=inception npm run eval  # Mercury
+npm run eval
 ```
 
-Runs every fixture in `evals/fixtures/ww-before-after.json` through the selected provider. Prints per-rule pass rate and a latency summary (mean / p50 / p95). Use this when you add a rule, switch a model, or want a head-to-head comparison between providers.
+Runs every fixture in `evals/fixtures/ww-before-after.json`. Prints per-rule pass rate and a latency summary (mean / p50 / p95). Use this when you add a rule or change a prompt.
 
 ## Deploy to Vercel
 
 1. Push to GitHub.
 2. Import the repo in Vercel.
-3. Set `ANTHROPIC_API_KEY` (and `INCEPTION_API_KEY` if you want the Mercury toggle to work) under Project → Settings → Environment Variables.
+3. Set `ANTHROPIC_API_KEY` under Project → Settings → Environment Variables.
 4. Deploy.
 
 The API routes are server-only — the key never reaches the browser.

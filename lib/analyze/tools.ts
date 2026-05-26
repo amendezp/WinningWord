@@ -90,29 +90,6 @@ export const documentTool: Anthropic.Tool = {
   },
 };
 
-/**
- * OpenAI-compatible function-calling shape (used by Inception Labs / Mercury,
- * which exposes an OpenAI-compatible chat completions endpoint).
- * Same JSON schema body, different envelope from Anthropic's tool shape.
- */
-export const paragraphToolOpenAI = {
-  type: "function" as const,
-  function: {
-    name: paragraphTool.name,
-    description: paragraphTool.description,
-    parameters: paragraphTool.input_schema,
-  },
-};
-
-export const documentToolOpenAI = {
-  type: "function" as const,
-  function: {
-    name: documentTool.name,
-    description: documentTool.description,
-    parameters: documentTool.input_schema,
-  },
-};
-
 // Tightly-typed views of what the model returns.
 export type ParagraphFeedback = {
   issues: Array<{

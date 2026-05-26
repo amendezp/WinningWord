@@ -1,17 +1,13 @@
 import { anthropicProvider } from "./anthropic";
-import { inceptionProvider } from "./inception";
-import type { AnalysisProvider, ProviderId } from "./types";
+import type { AnalysisProvider } from "./types";
 
-const REGISTRY: Record<ProviderId, AnalysisProvider> = {
-  anthropic: anthropicProvider,
-  inception: inceptionProvider,
-};
-
-export function getProvider(id: ProviderId | undefined): AnalysisProvider {
-  if (!id) return REGISTRY.anthropic;
-  return REGISTRY[id] ?? REGISTRY.anthropic;
+/**
+ * Only Anthropic ships today. The provider interface is kept so a second
+ * backend (Mercury, OpenAI, local) can be plugged in later without touching
+ * the routes, the store, or the UI.
+ */
+export function getProvider(): AnalysisProvider {
+  return anthropicProvider;
 }
-
-export const PROVIDER_IDS: ProviderId[] = ["anthropic", "inception"];
 
 export type { AnalysisProvider, ProviderId } from "./types";

@@ -1,6 +1,11 @@
 import type { ParagraphFeedback, DocumentFeedback } from "@/lib/analyze/tools";
 
-export type ProviderId = "anthropic" | "inception";
+/**
+ * Provider abstraction kept as scaffolding even after Mercury was removed.
+ * Adding a second backend later is mechanical — implement `AnalysisProvider`
+ * and register it in `./index`.
+ */
+export type ProviderId = "anthropic";
 
 export type AnalysisMeta = {
   provider: ProviderId;
