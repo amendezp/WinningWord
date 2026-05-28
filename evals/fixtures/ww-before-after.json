@@ -1,122 +1,179 @@
 [
   {
-    "name": "currently + in the process of",
+    "name": "wordiness: currently + in the process of",
     "ruleIds": ["wordiness"],
     "scope": "paragraph",
     "before": "I am currently working for Google and we are in the process of investigating ways to improve the system.",
     "expectedAnyOf": ["currently", "in the process of"]
   },
   {
-    "name": "in the event that",
+    "name": "wordiness: in the event that",
     "ruleIds": ["wordiness"],
     "scope": "paragraph",
     "before": "In the event that it rains tomorrow, the outdoor presentation will be moved indoors at no additional cost.",
     "expectedAnyOf": ["In the event that"]
   },
   {
-    "name": "at this point in time",
+    "name": "wordiness: at this point in time",
     "ruleIds": ["wordiness"],
     "scope": "paragraph",
     "before": "At this point in time, the team has not yet decided which vendor to choose for the renovation project.",
     "expectedAnyOf": ["At this point in time"]
   },
-
   {
-    "name": "successfully got",
-    "ruleIds": ["weak_adverb"],
+    "name": "wordiness: due to the fact that",
+    "ruleIds": ["wordiness"],
     "scope": "paragraph",
-    "before": "After months of work, I successfully got the scholarship and absolutely crushed the interview.",
-    "expectedAnyOf": ["successfully", "absolutely"]
-  },
-  {
-    "name": "completely crushed it",
-    "ruleIds": ["weak_adverb"],
-    "scope": "paragraph",
-    "before": "Our small team completely crushed the quarterly target and totally smashed every retention milestone.",
-    "expectedAnyOf": ["completely", "totally"]
+    "before": "Due to the fact that the supplier missed three deadlines, we cancelled the contract.",
+    "expectedAnyOf": ["Due to the fact that"]
   },
 
   {
-    "name": "incredibly smart -> brilliant",
-    "ruleIds": ["powerful_word"],
+    "name": "padded_phrase: I think + the possibility of + be prepared for",
+    "ruleIds": ["padded_phrase"],
     "scope": "paragraph",
-    "before": "Our new lead engineer is incredibly smart and the team trusts her judgment on every release.",
-    "expectedAnyOf": ["incredibly smart"]
+    "before": "I think you need to be prepared for the possibility of the markets crashing next quarter.",
+    "expectedAnyOf": ["I think", "be prepared for", "the possibility of"]
   },
   {
-    "name": "extremely important -> crucial",
-    "ruleIds": ["powerful_word"],
+    "name": "padded_phrase: be of assistance",
+    "ruleIds": ["padded_phrase"],
     "scope": "paragraph",
-    "before": "It is extremely important that we ship this on time for an especially unusual reason.",
-    "expectedAnyOf": ["extremely important", "especially unusual"]
+    "before": "Let me know if I can be of any assistance in helping you craft that report.",
+    "expectedAnyOf": ["be of any assistance", "be of assistance"]
   },
   {
-    "name": "dramatically cut -> slashed",
-    "ruleIds": ["powerful_word"],
+    "name": "padded_phrase: we have decided we need to",
+    "ruleIds": ["padded_phrase"],
     "scope": "paragraph",
-    "before": "Last quarter the team dramatically cut spending and grown up significantly in maturity.",
-    "expectedAnyOf": ["dramatically cut", "grown up significantly"]
+    "before": "To secure our future we have decided we need to restructure our workforce.",
+    "expectedAnyOf": ["we have decided we need to", "have decided we need to"]
   },
   {
-    "name": "walk fast -> stride",
-    "ruleIds": ["powerful_word"],
+    "name": "padded_phrase: trailing vagueness",
+    "ruleIds": ["padded_phrase"],
     "scope": "paragraph",
-    "before": "She walks fast across the lobby every morning at exactly eight.",
-    "expectedAnyOf": ["walks fast"]
+    "before": "Let me know if you're interested and we can go from there.",
+    "expectedAnyOf": ["and we can go from there", "we can go from there"]
   },
   {
-    "name": "impact significantly / negatively affect",
-    "ruleIds": ["powerful_word"],
+    "name": "padded_phrase: in the best capacity I can",
+    "ruleIds": ["padded_phrase"],
     "scope": "paragraph",
-    "before": "The outage will impact significantly our customers and negatively affect revenue this quarter.",
-    "expectedAnyOf": ["impact significantly", "negatively affect"]
+    "before": "I'd love to discuss how I can support you in the best capacity I can.",
+    "expectedAnyOf": ["in the best capacity I can", "the best capacity I can"]
   },
   {
-    "name": "mitigating the impact -> cushioning",
-    "ruleIds": ["powerful_word"],
-    "scope": "paragraph",
-    "before": "Our focus this week is mitigating the impact on the enterprise customers affected by Tuesday's outage.",
-    "expectedAnyOf": ["mitigating the impact"]
-  },
-
-  {
-    "name": "utilize + facilitate -> use + help",
-    "ruleIds": ["weak_verb"],
-    "scope": "paragraph",
-    "before": "We will utilize the new framework to facilitate faster onboarding for all new hires next quarter.",
-    "expectedAnyOf": ["utilize", "facilitate"]
-  },
-  {
-    "name": "incentivize -> encourage",
-    "ruleIds": ["weak_verb"],
-    "scope": "paragraph",
-    "before": "We must incentivize the sales team and operationalize the new pricing model before the end of Q4.",
-    "expectedAnyOf": ["incentivize", "operationalize"]
-  },
-  {
-    "name": "make better -> improve",
-    "ruleIds": ["weak_verb"],
-    "scope": "paragraph",
-    "before": "Our goal this quarter is to make better the onboarding flow and make sure churn drops below 5%.",
-    "expectedAnyOf": ["make better", "make sure"]
-  },
-  {
-    "name": "be able to -> just do it",
-    "ruleIds": ["weak_verb"],
+    "name": "padded_phrase: be able to",
+    "ruleIds": ["padded_phrase"],
     "scope": "paragraph",
     "before": "I'll be able to do this by Friday and the team will be able to ship next week.",
     "expectedAnyOf": ["be able to do", "be able to ship"]
   },
 
   {
-    "name": "inspiring and constructive",
+    "name": "weak_adverb: successfully got",
+    "ruleIds": ["weak_adverb"],
+    "scope": "paragraph",
+    "before": "After months of work, I successfully got the scholarship and absolutely crushed the interview.",
+    "expectedAnyOf": ["successfully", "absolutely"]
+  },
+  {
+    "name": "weak_adverb: completely crushed",
+    "ruleIds": ["weak_adverb"],
+    "scope": "paragraph",
+    "before": "Our small team completely crushed the quarterly target and totally smashed every retention milestone.",
+    "expectedAnyOf": ["completely", "totally"]
+  },
+  {
+    "name": "weak_adverb: literally screamed",
+    "ruleIds": ["weak_adverb"],
+    "scope": "paragraph",
+    "before": "When I saw the bug ship to production I literally screamed at the screen.",
+    "expectedAnyOf": ["literally"]
+  },
+  {
+    "name": "padded_phrase: I am personally happy to",
+    "ruleIds": ["padded_phrase"],
+    "scope": "paragraph",
+    "before": "I am personally happy to join your board and help where I can.",
+    "expectedAnyOf": ["I am personally happy to", "personally happy"]
+  },
+
+  {
+    "name": "powerful_word: incredibly smart -> brilliant",
+    "ruleIds": ["powerful_word"],
+    "scope": "paragraph",
+    "before": "Our new lead engineer is incredibly smart and the team trusts her judgment on every release.",
+    "expectedAnyOf": ["incredibly smart"]
+  },
+  {
+    "name": "powerful_word: extremely important -> crucial",
+    "ruleIds": ["powerful_word"],
+    "scope": "paragraph",
+    "before": "It is extremely important that we ship this on time for an especially unusual reason.",
+    "expectedAnyOf": ["extremely important", "especially unusual"]
+  },
+  {
+    "name": "powerful_word: dramatically cut -> slashed",
+    "ruleIds": ["powerful_word"],
+    "scope": "paragraph",
+    "before": "Last quarter the team dramatically cut spending across every line.",
+    "expectedAnyOf": ["dramatically cut"]
+  },
+  {
+    "name": "powerful_word: walk fast -> stride",
+    "ruleIds": ["powerful_word"],
+    "scope": "paragraph",
+    "before": "She walks fast across the lobby every morning at exactly eight.",
+    "expectedAnyOf": ["walks fast"]
+  },
+  {
+    "name": "powerful_word: negatively affect -> hurt",
+    "ruleIds": ["powerful_word"],
+    "scope": "paragraph",
+    "before": "The outage will negatively affect revenue this quarter and slow next quarter's growth.",
+    "expectedAnyOf": ["negatively affect"]
+  },
+
+  {
+    "name": "weak_verb: utilize + facilitate",
+    "ruleIds": ["weak_verb"],
+    "scope": "paragraph",
+    "before": "We will utilize the new framework to facilitate faster onboarding for all new hires next quarter.",
+    "expectedAnyOf": ["utilize", "facilitate"]
+  },
+  {
+    "name": "weak_verb: incentivize + operationalize",
+    "ruleIds": ["weak_verb"],
+    "scope": "paragraph",
+    "before": "We must incentivize the sales team and operationalize the new pricing model before the end of Q4.",
+    "expectedAnyOf": ["incentivize", "operationalize"]
+  },
+  {
+    "name": "weak_verb: make better + make sure",
+    "ruleIds": ["weak_verb"],
+    "scope": "paragraph",
+    "before": "Our goal this quarter is to make better the onboarding flow and make sure churn drops below 5%.",
+    "expectedAnyOf": ["make better", "make sure"]
+  },
+  {
+    "name": "weak_verb: mitigating the impact",
+    "ruleIds": ["weak_verb"],
+    "scope": "paragraph",
+    "before": "Our focus this week is mitigating the impact on the enterprise customers affected by Tuesday's outage.",
+    "expectedAnyOf": ["mitigating the impact"]
+  },
+
+  {
+    "name": "synonym_pair: inspiring and constructive",
     "ruleIds": ["synonym_pair"],
     "scope": "paragraph",
     "before": "You can show you are an inspiring and constructive leader by how you write.",
     "expectedAnyOf": ["inspiring and constructive"]
   },
   {
-    "name": "rare and extraordinary",
+    "name": "synonym_pair: rare and extraordinary",
     "ruleIds": ["synonym_pair"],
     "scope": "paragraph",
     "before": "She is a rare and extraordinary talent who joined us last summer from a clear and obvious rival.",
@@ -124,21 +181,21 @@
   },
 
   {
-    "name": "ecommerce space",
+    "name": "useless_jargon: ecommerce space",
     "ruleIds": ["useless_jargon"],
     "scope": "paragraph",
     "before": "I work in the ecommerce space and we are seeing rapid growth this quarter.",
     "expectedAnyOf": ["space"]
   },
   {
-    "name": "crisis situation",
+    "name": "useless_jargon: crisis situation + action plan",
     "ruleIds": ["useless_jargon"],
     "scope": "paragraph",
     "before": "When the outage hit, we treated it as a crisis situation and rolled out our action plan within an hour.",
     "expectedAnyOf": ["situation", "action plan"]
   },
   {
-    "name": "action items -> tasks",
+    "name": "useless_jargon: action items",
     "ruleIds": ["useless_jargon"],
     "scope": "paragraph",
     "before": "Three action items came out of yesterday's review and we'll close them by end of week.",
@@ -146,7 +203,7 @@
   },
 
   {
-    "name": "alumni that donate",
+    "name": "who_vs_that: alumni that donate",
     "ruleIds": ["who_vs_that"],
     "scope": "paragraph",
     "before": "GSB alumni that donate to the school have a profound effect on the next generation of students.",
@@ -154,7 +211,7 @@
   },
 
   {
-    "name": "dangling modifier (renowned investor)",
+    "name": "dangling_modifier: renowned investor",
     "ruleIds": ["dangling_modifier"],
     "scope": "paragraph",
     "before": "As a renowned and savvy investor, I would love to spend 30 minutes with you to hear your feedback regarding my investment thesis.",
@@ -162,7 +219,7 @@
   },
 
   {
-    "name": "destructive phrasing — this is boring",
+    "name": "destructive_phrasing: this is boring",
     "ruleIds": ["destructive_phrasing"],
     "scope": "paragraph",
     "before": "This presentation is boring and the analysis is irrational.",
@@ -170,14 +227,14 @@
   },
 
   {
-    "name": "progressive -ing verb",
+    "name": "ing_verb: is leading + is preparing",
     "ruleIds": ["ing_verb"],
     "scope": "paragraph",
     "before": "Our team is leading the integration and is preparing the launch plan for next quarter.",
     "expectedAnyOf": ["is leading", "is preparing"]
   },
   {
-    "name": "progressive -ing verb 2",
+    "name": "ing_verb: is mentoring + is rewriting",
     "ruleIds": ["ing_verb"],
     "scope": "paragraph",
     "before": "She is mentoring three new hires while she is rewriting the onboarding handbook.",
@@ -211,21 +268,45 @@
   },
   {
     "name": "NEG: had had — genuine repetition",
-    "ruleIds": ["wordiness", "synonym_pair"],
+    "ruleIds": ["wordiness", "synonym_pair", "padded_phrase"],
     "scope": "paragraph_negative",
     "before": "She told me she had had a difficult week before the announcement landed."
   },
   {
     "name": "NEG: clean strong prose, no wordiness",
-    "ruleIds": ["wordiness", "weak_adverb", "weak_verb"],
+    "ruleIds": ["wordiness", "weak_adverb", "weak_verb", "padded_phrase"],
     "scope": "paragraph_negative",
     "before": "We ship every Friday. The team trusts the build. Outages are rare."
   },
   {
-    "name": "NEG: who used correctly — no who_vs_that",
+    "name": "NEG: who used correctly",
     "ruleIds": ["who_vs_that"],
     "scope": "paragraph_negative",
     "before": "The candidates who applied last quarter performed best in the panel review."
+  },
+  {
+    "name": "NEG: short clean sentences — no praise pile-on",
+    "ruleIds": ["punchy_brevity", "strong_short_verb"],
+    "scope": "paragraph_negative",
+    "before": "We approved the project. The team is ready."
+  },
+  {
+    "name": "NEG: strong verb in normal prose — no spurious praise",
+    "ruleIds": ["strong_short_verb"],
+    "scope": "paragraph_negative",
+    "before": "The committee approved the proposal at the end of the meeting."
+  },
+  {
+    "name": "NEG: legitimate intensifier — earned",
+    "ruleIds": ["powerful_word", "weak_adverb"],
+    "scope": "paragraph_negative",
+    "before": "The doctor confirmed the diagnosis is terminal."
+  },
+  {
+    "name": "NEG: action plan in name, not jargon",
+    "ruleIds": ["useless_jargon"],
+    "scope": "paragraph_negative",
+    "before": "The Marshall Plan rebuilt Europe after World War II."
   },
 
   {
@@ -233,6 +314,18 @@
     "ruleIds": ["bluf"],
     "scope": "document",
     "before": "I am the co-founder of BorrowBear, a peer-to-peer rental marketplace that is scaling at 100% month-over-month and recently passed 10,000 users. The goal is to become the Airbnb of everything, where people can rent items temporarily and lenders can generate substantial passive income by sharing items they already own. Do you have 20 minutes for me to tell you more?"
+  },
+  {
+    "name": "doc: BLUF — throat-clearing opener",
+    "ruleIds": ["bluf"],
+    "scope": "document",
+    "before": "Hope you're having a great Tuesday! I wanted to reach out about our new analytics platform, which I've been working on for the past six months. Our team has invested significant resources into building a product we're proud of. Today I'd like to walk you through what we've learned and where we're headed next."
+  },
+  {
+    "name": "doc: BLUF — meta opening",
+    "ruleIds": ["bluf"],
+    "scope": "document",
+    "before": "This document discusses the rationale for our Q4 pricing changes. The team has been considering several options. Below, we outline each option and the relevant trade-offs. We welcome your feedback before the next planning cycle."
   },
   {
     "name": "doc: audience missing",
@@ -247,31 +340,19 @@
     "before": "Our platform helps small teams ship faster by removing friction in the deploy pipeline. The core insight: most outages come from human steps, not code.\n\nSmall teams move slower than they should because deploys involve too many manual steps. Each manual step is a chance for human error. Our platform automates those steps.\n\nThe payoff: small teams ship without fear. They stop dreading Friday afternoons. The platform handles the human-error parts so engineers can focus on the work."
   },
   {
-    "name": "doc: missing call to action",
-    "ruleIds": ["happy_ending"],
+    "name": "doc: weak_conclusion — missing call to action",
+    "ruleIds": ["weak_conclusion"],
     "scope": "document",
     "before": "Our analysis suggests the new pricing tier should land between $39 and $59 per seat per month. We modeled three scenarios. In all three, contribution margin improves materially. Adoption looks healthy in the willingness-to-pay survey. There are some open questions about enterprise carve-outs and whether to bundle the audit log."
   },
   {
-    "name": "doc: weak hook — throat clearing opener",
-    "ruleIds": ["weak_hook"],
-    "scope": "document",
-    "before": "Hope you're having a great Tuesday! I wanted to reach out about our new analytics platform, which I've been working on for the past six months. Our team has invested significant resources into building a product we're proud of. Today I'd like to walk you through what we've learned and where we're headed next."
-  },
-  {
-    "name": "doc: weak hook — meta opening",
-    "ruleIds": ["weak_hook"],
-    "scope": "document",
-    "before": "This document discusses the rationale for our Q4 pricing changes. The team has been considering several options. Below, we outline each option and the relevant trade-offs. We welcome your feedback before the next planning cycle."
-  },
-  {
-    "name": "doc: weak conclusion — just stops",
+    "name": "doc: weak_conclusion — just stops",
     "ruleIds": ["weak_conclusion"],
     "scope": "document",
     "before": "The migration plan is on track. Engineering, ops, and support have all been briefed. We will run a dry-run on staging next week. Database swaps are scheduled. The team has been briefed."
   },
   {
-    "name": "doc: weak conclusion — recap only",
+    "name": "doc: weak_conclusion — recap only",
     "ruleIds": ["weak_conclusion"],
     "scope": "document",
     "before": "Pricing matters. Audience matters. Distribution matters. As we've shown, all three need to align for a launch to succeed. In summary, we covered three factors that determine outcomes. Teams that ignore any one of them tend to underperform."

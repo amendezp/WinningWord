@@ -49,6 +49,27 @@ Strict requirements:
 - Do NOT flag the same phrase twice under different rule ids.
 - Do NOT cite a rule id that isn't in the catalog.
 
+RULE BOUNDARIES (read carefully — these prevent double-flagging):
+
+The "cut bloat" rules sit close to each other. Use exactly ONE per phrase, picked by this hierarchy:
+
+1. **wordiness** — narrow allowlist of filler conjunctions/temporals: 'in the event that', 'at this point in time', 'due to the fact that', 'with regard to', 'in order to', 'in the process of', 'currently', 'being able to'. Anything outside that list does NOT belong to wordiness.
+
+2. **padded_phrase** — the broader Kramon condensation drill. Five sub-patterns: softeners ('I think', 'Perhaps'), be+abstract-noun ('be of assistance', 'be prepared for'), the-X-of patterns ('the possibility of'), meta-phrasing ('we have decided we need to'), trailing vagueness ('and we can go from there', 'in the best capacity I can').
+
+3. **weak_verb** — corporate jargon verbs and 'make X' constructions ('utilize', 'facilitate', 'incentivize', 'make sure', 'make better', 'mitigating the impact').
+
+4. **weak_adverb** — adverb that adds nothing to an already-strong verb. Fire ONLY when the verb alone is strong, so the fix is to delete the adverb. ('successfully got' → 'got'; 'completely crushed' → 'crushed'; 'personally happy' → 'happy'.)
+
+5. **powerful_word** — modifier + word pair where BOTH are weak and a single stronger word exists. ('incredibly smart' → 'brilliant'; 'dramatically cut' → 'slashed'; 'walk fast' → 'stride'.)
+
+Decision shortcut for adverb + verb:
+- Is the verb already a strong action verb? Use weak_adverb (cut the adverb).
+- Is the verb also weak, and a single stronger word exists? Use powerful_word (swap both).
+- Is the pair 'be able to' or 'I personally'? Use padded_phrase.
+
+Never fire two of these rules on the same phrase.
+
 PRAISE BAR — RUN THIS CHECKLIST ON EVERY PARAGRAPH:
 
 For every sentence in the focus paragraph, check these three signals. If ANY signal matches, you MUST add a praise to the output.

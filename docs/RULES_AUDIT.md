@@ -231,6 +231,40 @@ That's ~10 new fixtures, plus the schema is already there. Roughly an hour of wo
 
 ---
 
+## Finding 9 — many real-prose bloat patterns aren't covered
+
+Surfaced by Kramon's Session 9 condensation exercise (2026-05-26):
+
+| Original | Kramon's condensed version | Rule we'd fire today |
+|---|---|---|
+| *"I think you need to be prepared for the possibility of the markets crashing."* | "Prepare for a market crash." | — none |
+| *"Let me know if I can be of any assistance in helping you craft that report."* | "Let me know if I can help with that report." | — none |
+| *"Email is the main way we speak to each other these days, but we often do it badly."* | "Email is how we speak today — and we do it badly." | — none |
+| *"To be able to secure our future we have decided we need to restructure our workforce."* | "To secure our future, we must restructure our workforce." | `weak_verb` (catches "be able to" only) |
+| *"I am personally happy to join your board and would love to discuss how I can support you in the best capacity I can."* | "I'd love to join your board. Let's discuss how I can help." | `weak_adverb` (catches "personally" only) |
+| *"Let me know if you're interested and we can go from there."* | "Let me know if you're interested." | — none |
+| *"Hope you're well."* (mid-doc) | Don't write this. | — none (`weak_hook` only fires on openers) |
+
+**~2 of 7 cleanly caught.** The pattern: our `wordiness` rule has a strict-but-narrow allowlist (`currently`, `in the process of`, etc.) and `weak_verb` covers `make X` / `be able to`. Neither covers the broader Kramon drill: softeners, padded verbs of being, padded nouns, trailing vagueness, meta-phrasing.
+
+### Proposed fix — new rule `padded_phrase` (paragraph, issue)
+
+Distinct from `wordiness` (filler conjunctions/temporals) and `weak_verb` (corporate jargon verbs). Five sub-patterns, all with phrase lists:
+
+1. **Softeners** at sentence start: "I think", "I feel", "I believe", "I'm wondering if", "It seems that", "Perhaps". Cut unless genuinely uncertain.
+2. **Be + abstract noun**: "be of assistance" → "help", "be prepared for" → "prepare for", "be in a position to" → "can".
+3. **The possibility/question/issue of X**: "the possibility of X crashing" → "X crashing"; "the question of whether" → "whether".
+4. **Meta-phrasing**: "we have decided we need to" → "we will"; "we wanted to reach out about" → cut entirely.
+5. **Trailing vagueness**: "and we can go from there", "or something like that", "as needed", "going forward", "at the end of the day".
+
+The lists ARE the rule — like `wordiness`. Avoid asking the model to detect "padded" by vibes.
+
+### Files
+- `lib/rules/catalog.ts` — new rule entry with the five sub-patterns and concrete before/after for each
+- `evals/fixtures/ww-before-after.json` — add fixtures for Kramon's 5–6 condensation cases so we don't regress
+
+---
+
 ## Recommended ship order
 
 If we want to ship in chunks rather than one big sweep:
@@ -238,10 +272,49 @@ If we want to ship in chunks rather than one big sweep:
 1. **Findings 3 + 4** — merge `weak_hook` into `bluf` and `happy_ending` into `weak_conclusion`. Drops 2 rules. Reduces "two doc cards on the same problem" UX confusion. Two files changed, ~30 lines.
 2. **Findings 1 + 2** — sharpen `weak_adverb` / `powerful_word` / `weak_verb` boundaries with prompt instruction + example shuffling. ~50 lines.
 3. **Finding 5** — tighten `wordiness` to a strict allowlist. ~10 lines + a prompt note.
-4. **Finding 7** — voice pass. Mostly text edits.
-5. **Finding 8** — fixture coverage. Mechanical.
+4. **Finding 9** — add `padded_phrase` rule with Kramon Session 9 patterns. ~80 lines (new rule + 5 fixtures).
+5. **Finding 7** — voice pass. Mostly text edits.
+6. **Finding 8** — fixture coverage. Mechanical.
 
 Each step keeps the eval green. Each step is reversible.
+
+**Per user direction (2026-05-26): ship all of the above in one pass.** The audit doc gets a "Shipped" section appended once the sweep lands.
+
+---
+
+## Shipped — 2026-05-26
+
+All nine findings landed in a single commit. Eval suite runs **52/52 (100%)** with 8 negative fixtures up from 4.
+
+### Catalog deltas (20 rules → 19 rules)
+
+| Action | Rule | Notes |
+|---|---|---|
+| **NEW** | `padded_phrase` | Five sub-patterns (softeners, be+abstract-noun, the-X-of, meta-phrasing, trailing vagueness). 9 fixtures. |
+| **DELETED** | `weak_hook` | Merged into `bluf`. BLUF now explicitly covers throat-clearing, meta openings, and lede-burial. |
+| **DELETED** | `happy_ending` | Merged into `weak_conclusion`. Conclusion now covers asks + dates for pitches AND takeaways for any doc. |
+| **TIGHTENED** | `wordiness` | Strict allowlist of filler conjunctions/temporals only. Padded patterns moved to `padded_phrase` and `weak_verb`. |
+| **TIGHTENED** | `weak_adverb` | Adverb + VERB only (cut the adverb when verb is strong). Adverb + adjective routes to `padded_phrase` or `powerful_word`. |
+| **TIGHTENED** | `powerful_word` | Modifier+word pair where BOTH are weak (one stronger word exists). Mutually exclusive with `weak_adverb`. |
+| **TIGHTENED** | `weak_verb` | Owns 'mitigating the impact' (moved from `powerful_word`). 'be able to' moved to `padded_phrase`. |
+| **VOICE PASS** | every rule | shortDesc and longDesc rewritten shorter; tool no longer ironically wordy in its own descriptions. |
+
+### Prompt
+
+`PARAGRAPH_SYSTEM_PROMPT` gained an explicit **RULE BOUNDARIES** block: a five-step hierarchy (wordiness → padded_phrase → weak_verb → weak_adverb → powerful_word) plus an "adverb + verb decision shortcut" so the model never double-flags the same phrase.
+
+### Fixtures (40 → 52)
+
+- 9 new positive fixtures for `padded_phrase` covering all five sub-patterns and Kramon's Session 9 exercise sentences (markets crashing, be of assistance, decision narration, trailing vagueness, in the best capacity, be able to, I am personally happy to).
+- 4 new negative fixtures (false-positive guards): no praise on generic short prose, no powerful_word on legitimate intensifier ("terminal"), no useless_jargon on "the Marshall Plan", no strong_short_verb on "approved".
+- Doc fixtures rerouted: 2 weak_hook → bluf, 1 happy_ending → weak_conclusion.
+- `weak_adverb` swapped one example to a clean adverb+verb case ("literally screamed").
+
+### Out of scope (still)
+
+- Praise calibration — separate prompt tuning, not a rule-design issue.
+- New rules beyond `padded_phrase` (passive voice, story arc, evidence-needed). Wait for real prose to surface what's missing.
+- Multi-provider work — Mercury experiment removed last commit.
 
 ## Out of scope of this audit
 
