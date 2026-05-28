@@ -261,6 +261,18 @@
   },
 
   {
+    "name": "NEG: parallel list — stylistic, not padded",
+    "ruleIds": ["padded_phrase"],
+    "scope": "paragraph_negative",
+    "before": "Writing is an art. It requires a heart, to be emotional; a soul, to have an authentic opinion; and a gut, to have the courage to say what's right."
+  },
+  {
+    "name": "NEG: anaphora — deliberate repetition",
+    "ruleIds": ["padded_phrase"],
+    "scope": "paragraph_negative",
+    "before": "We build. We ship. We listen. We do it again on Monday."
+  },
+  {
     "name": "NEG: clean prose, no -ing flag",
     "ruleIds": ["ing_verb"],
     "scope": "paragraph_negative",

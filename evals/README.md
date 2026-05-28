@@ -22,7 +22,7 @@ Output: per-fixture ✓/✗ with latency, per-rule pass-rate table, mean/p50/p95
 | `paragraph_negative` | The named rule **must not** fire on the text (false-positive guard). Clean prose, "had had" as legitimate repetition, etc. |
 | `document` | A whole-doc rule (BLUF, audience, redundancy, happy_ending) must surface as an observation. |
 
-52 fixtures total today: 36 paragraph positives, 8 paragraph negatives, 8 document positives. Coverage spans all 19 rules in the catalog.
+54 fixtures total today: 36 paragraph positives, 10 paragraph negatives, 8 document positives. Coverage spans all 19 rules in the catalog.
 
 ## Baseline
 

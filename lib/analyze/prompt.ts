@@ -9,8 +9,10 @@ import {
 import type { Rule } from "@/lib/rules/types";
 
 function renderRuleForPrompt(r: Rule): string {
+  // Include up to 8 examples — some rules carry DO-NOT-FLAG anti-examples
+  // that the model needs to see to suppress false positives.
   const ex = r.examples
-    .slice(0, 3)
+    .slice(0, 8)
     .map((e) =>
       e.after
         ? `    Before: ${e.before}\n    After:  ${e.after}${e.note ? `\n    Note:   ${e.note}` : ""}`
@@ -48,6 +50,14 @@ Strict requirements:
 - Be sparing on issues and improvements (0–3 issues, 0–2 improvements per paragraph; don't stretch). Praise is different — see the PRAISE BAR below.
 - Do NOT flag the same phrase twice under different rule ids.
 - Do NOT cite a rule id that isn't in the catalog.
+
+SOFT CAPS (defaults — break only when clearly earned):
+
+- **Aim for ≤3 cards total per paragraph** (issues + improvements + praises combined). If a paragraph has more flaggable problems than that, pick the three the writer most needs to see. Lower-impact ones should be cut. Exception: if every flag is unambiguous and skipping one would mislead the writer, include it.
+
+- **Aim for ≤2 praises per paragraph.** Most paragraphs deserve at most one praise; two only when both moments are genuinely distinct and strong. Three or more is almost never right — if you find yourself wanting to praise three things, you're probably grading too generously. The exception: a paragraph that is mostly a Kramon-style sequence of taglines (rare — think "Diamonds aren't forever. Write on. Brilliant!") where each sentence independently earns the bar.
+
+- When picking which to keep under the cap: prefer cards near the end of the paragraph (the punch lands harder), prefer issues over improvements over praises (in that order — the writer benefits most from knowing what's broken), and prefer rules with concrete suggestions over diagnoses.
 
 RULE BOUNDARIES (read carefully — these prevent double-flagging):
 

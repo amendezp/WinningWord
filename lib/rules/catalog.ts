@@ -37,7 +37,7 @@ export const RULES: Rule[] = [
     name: "Padded phrase",
     shortDesc: "Cut softeners, padded verbs of being, and trailing vagueness.",
     longDesc:
-      "Kramon's condensation drill. Five patterns to flag, each with concrete phrase lists:\n\n(1) SOFTENERS at sentence start — 'I think', 'I feel', 'I believe', 'I'm wondering if', 'It seems that', 'Perhaps'. Cut unless the hedge is genuinely earned.\n\n(2) BE + ABSTRACT NOUN — 'be of assistance' → 'help', 'be prepared for' → 'prepare for', 'be in a position to' → 'can'.\n\n(3) THE POSSIBILITY/QUESTION/ISSUE OF X — 'the possibility of X crashing' → 'X crashing'; 'the question of whether' → 'whether'.\n\n(4) META-PHRASING — 'we have decided we need to' → 'we will'; 'we wanted to reach out about' → cut entirely; 'I am personally happy to' → 'I'd love to'.\n\n(5) TRAILING VAGUENESS — 'and we can go from there', 'or something like that', 'as needed', 'going forward', 'at the end of the day', 'in the best capacity I can'.",
+      "Kramon's condensation drill. Five patterns to flag, each with concrete phrase lists:\n\n(1) SOFTENERS at sentence start — 'I think', 'I feel', 'I believe', 'I'm wondering if', 'It seems that', 'Perhaps'. Cut unless the hedge is genuinely earned.\n\n(2) BE + ABSTRACT NOUN — 'be of assistance' → 'help', 'be prepared for' → 'prepare for', 'be in a position to' → 'can'.\n\n(3) THE POSSIBILITY/QUESTION/ISSUE OF X — 'the possibility of X crashing' → 'X crashing'; 'the question of whether' → 'whether'.\n\n(4) META-PHRASING — 'we have decided we need to' → 'we will'; 'we wanted to reach out about' → cut entirely; 'I am personally happy to' → 'I'd love to'.\n\n(5) TRAILING VAGUENESS — 'and we can go from there', 'or something like that', 'as needed', 'going forward', 'at the end of the day', 'in the best capacity I can'.\n\nDO NOT FLAG stylistic intent. Parallel lists of three or more clauses ('to be X, to have Y, to bring Z'), deliberate anaphora ('we build, we ship, we listen'), or rhetorical structure are NOT padded phrases — they're craft. If the 'to be / to have' pattern is part of an obvious parallel construction, leave it alone. Padded phrases are padding; if the writer is using the shape for effect, that's the opposite of padding. Do not flag typos or grammatical mistakes either — that's not a padded phrase ('to have to courage' is a typo for 'to have the courage', not bloat).",
     examples: [
       {
         before: "I think you need to be prepared for the possibility of the markets crashing.",
@@ -63,6 +63,14 @@ export const RULES: Rule[] = [
         before: "I'd love to discuss how I can support you in the best capacity I can.",
         after: "Let's discuss how I can help.",
         note: "Trailing vagueness + padded verb.",
+      },
+      {
+        before: "Writing requires a heart, to be emotional; a soul, to have an authentic opinion; and a gut, to have the courage to say what's right.",
+        note: "DO NOT FLAG. This is a parallel list of three infinitives ('to be / to have / to have') — deliberate craft, not padding. The shape IS the meaning.",
+      },
+      {
+        before: "We build. We ship. We listen.",
+        note: "DO NOT FLAG. Anaphora — deliberate repetition for effect.",
       },
     ],
   },
