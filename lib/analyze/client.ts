@@ -1,5 +1,5 @@
 import type { ParagraphFeedback, DocumentFeedback } from "./tools";
-import type { AnalysisMeta } from "./providers/types";
+import type { AnalysisMeta, ProviderId } from "./providers/types";
 
 export type ParagraphResponse = ParagraphFeedback & { meta: AnalysisMeta };
 export type DocumentResponse = DocumentFeedback & { meta: AnalysisMeta };
@@ -7,6 +7,7 @@ export type DocumentResponse = DocumentFeedback & { meta: AnalysisMeta };
 export async function analyzeParagraph(args: {
   focusParagraph: string;
   documentBody: string;
+  provider: ProviderId;
   signal?: AbortSignal;
 }): Promise<ParagraphResponse> {
   const resp = await fetch("/api/analyze-paragraph", {
@@ -15,6 +16,7 @@ export async function analyzeParagraph(args: {
     body: JSON.stringify({
       focusParagraph: args.focusParagraph,
       documentBody: args.documentBody,
+      provider: args.provider,
     }),
     signal: args.signal,
   });
@@ -27,12 +29,16 @@ export async function analyzeParagraph(args: {
 
 export async function analyzeDocument(args: {
   documentBody: string;
+  provider: ProviderId;
   signal?: AbortSignal;
 }): Promise<DocumentResponse> {
   const resp = await fetch("/api/analyze-document", {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ documentBody: args.documentBody }),
+    body: JSON.stringify({
+      documentBody: args.documentBody,
+      provider: args.provider,
+    }),
     signal: args.signal,
   });
   if (!resp.ok) {

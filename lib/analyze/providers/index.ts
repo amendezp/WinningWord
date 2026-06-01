@@ -1,13 +1,23 @@
 import { anthropicProvider } from "./anthropic";
-import type { AnalysisProvider } from "./types";
+import { inceptionProvider } from "./inception";
+import type { AnalysisProvider, ProviderId } from "./types";
+
+const REGISTRY: Record<ProviderId, AnalysisProvider> = {
+  anthropic: anthropicProvider,
+  inception: inceptionProvider,
+};
 
 /**
- * Only Anthropic ships today. The provider interface is kept so a second
- * backend (Mercury, OpenAI, local) can be plugged in later without touching
- * the routes, the store, or the UI.
+ * Returns the requested provider, falling back to Anthropic for any
+ * unrecognised id or missing argument. The fallback is intentional —
+ * the routes accept a `provider` field from the client; we'd rather
+ * silently use the safe default than throw.
  */
-export function getProvider(): AnalysisProvider {
-  return anthropicProvider;
+export function getProvider(id?: ProviderId): AnalysisProvider {
+  if (!id) return REGISTRY.anthropic;
+  return REGISTRY[id] ?? REGISTRY.anthropic;
 }
+
+export const PROVIDER_IDS: ProviderId[] = ["anthropic", "inception"];
 
 export type { AnalysisProvider, ProviderId } from "./types";

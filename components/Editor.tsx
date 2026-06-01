@@ -15,6 +15,7 @@ import {
 } from "@/lib/decorations/highlightPlugin";
 import { forbiddenPlugin } from "@/lib/decorations/forbiddenPlugin";
 import { useSuggestionsStore } from "@/lib/store/suggestions";
+import { useProviderStore } from "@/lib/store/providerPreference";
 import { shouldAnalyze } from "@/lib/trigger/sentenceTrigger";
 import { shouldRunDocumentPass } from "@/lib/trigger/documentTrigger";
 import { analyzeParagraph, analyzeDocument } from "@/lib/analyze/client";
@@ -55,6 +56,7 @@ export function Editor() {
   const pruneStale = useSuggestionsStore((s) => s.pruneStale);
   const paragraphSuggestions = useSuggestionsStore((s) => s.paragraphSuggestions);
   const focusedUid = useSuggestionsStore((s) => s.focusedUid);
+  const providerMode = useProviderStore((s) => s.providerMode);
 
   // Per-paragraph trigger state, keyed by paragraph index.
   // - lastAnalyzedText: last text successfully analyzed (drives "is something new?")
@@ -108,6 +110,7 @@ export function Editor() {
         const resp = await analyzeParagraph({
           focusParagraph: paragraphText,
           documentBody: docBody,
+          provider: providerMode,
           signal: ac.signal,
         });
         const { meta, ...feedback } = resp;
@@ -124,7 +127,7 @@ export function Editor() {
         }
       }
     };
-  }, [setPendingParagraph, upsertParagraph]);
+  }, [setPendingParagraph, upsertParagraph, providerMode]);
 
   const runDocumentPass = useMemo(() => {
     return async (docBody: string) => {
@@ -138,6 +141,7 @@ export function Editor() {
       try {
         const resp = await analyzeDocument({
           documentBody: docBody,
+          provider: providerMode,
           signal: ac.signal,
         });
         const { meta, ...feedback } = resp;
@@ -154,7 +158,7 @@ export function Editor() {
         if (docInflightRef.current === ac) docInflightRef.current = null;
       }
     };
-  }, [setDocumentFeedback, setPendingDocument]);
+  }, [setDocumentFeedback, setPendingDocument, providerMode]);
 
   // One-time mount-seed: pre-populate suggestions + document feedback from
   // lib/seed.ts, then mark every initial paragraph as already-analyzed so the

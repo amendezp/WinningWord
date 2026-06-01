@@ -1,11 +1,14 @@
 import type { ParagraphFeedback, DocumentFeedback } from "@/lib/analyze/tools";
 
 /**
- * Provider abstraction kept as scaffolding even after Mercury was removed.
- * Adding a second backend later is mechanical — implement `AnalysisProvider`
- * and register it in `./index`.
+ * Two providers ship today:
+ *   - "anthropic" → Claude (Haiku for paragraph, Sonnet for document)
+ *   - "inception" → Mercury 2 (diffusion, OpenAI-compatible endpoint)
+ *
+ * Adding a third is mechanical — implement `AnalysisProvider` and register
+ * it in `./index`.
  */
-export type ProviderId = "anthropic";
+export type ProviderId = "anthropic" | "inception";
 
 export type AnalysisMeta = {
   provider: ProviderId;

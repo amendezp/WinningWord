@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { DocumentFeedback } from "@/lib/analyze/tools";
-import { getProvider } from "@/lib/analyze/providers";
+import { getProvider, type ProviderId } from "@/lib/analyze/providers";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
 type RequestBody = {
   documentBody: string;
+  provider?: ProviderId;
 };
 
 export async function POST(req: NextRequest) {
@@ -14,11 +15,11 @@ export async function POST(req: NextRequest) {
   if (!body.documentBody || body.documentBody.trim().length < 20) {
     return NextResponse.json({
       observations: [],
-      meta: { provider: "anthropic", modelName: "skipped", latencyMs: 0 },
+      meta: { provider: body.provider ?? "anthropic", modelName: "skipped", latencyMs: 0 },
     } satisfies DocumentFeedback & { meta: unknown });
   }
 
-  const provider = getProvider();
+  const provider = getProvider(body.provider);
   try {
     const { feedback, meta } = await provider.analyzeDocument({
       documentBody: body.documentBody,

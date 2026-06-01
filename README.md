@@ -22,19 +22,16 @@ Open <http://localhost:3000>.
 
 ## Models
 
-| Pass | Model | Why |
-|---|---|---|
-| Pass A — paragraph | Claude Haiku 4.5 | Fast, cheap, 100% on the paragraph eval suite. Fires after every 2–3 sentences. |
-| Pass B — whole document | Claude Sonnet 4.6 | Holistic reasoning over the full doc. Fires on idle or every 5 paragraph passes. |
+Two providers ship today, swapped via the top-bar toggle:
 
-Override either via env (see `.env.example`):
+| Provider | Pass A (paragraph) | Pass B (document) | Notes |
+|---|---|---|---|
+| **Claude** (default) | Claude Haiku 4.5 | Claude Sonnet 4.6 | 100% on the eval suite. Authoritative. |
+| **Mercury** (diffusion) | Mercury 2 | Mercury 2 | ~4–8× faster end-to-end via OpenAI-compatible endpoint. Tends to under-flag multi-issue paragraphs. |
 
-```
-WW_PARAGRAPH_MODEL=claude-haiku-4-5-20251001
-WW_DOCUMENT_MODEL=claude-sonnet-4-6
-```
+Selection persists in `localStorage`. Every suggestion card carries a latency badge so the comparison is visible as you write.
 
-The provider abstraction in `lib/analyze/providers/` is set up so a second backend can be added later without touching the routes or the UI.
+To use Mercury, set `INCEPTION_API_KEY` in `.env.local` (get one at <https://platform.inceptionlabs.ai>, 10M free tokens on signup). Override individual models with the env keys in `.env.example`.
 
 ### Gotcha: shell env vars shadow `.env.local`
 
@@ -53,16 +50,17 @@ Edit `lib/rules/catalog.ts` — see `lib/rules/README.md`. The editor, prompts, 
 ## Running evals
 
 ```bash
-npm run eval
+npm run eval                        # Anthropic (default)
+WW_PROVIDER=inception npm run eval  # Mercury
 ```
 
-Runs every fixture in `evals/fixtures/ww-before-after.json`. Prints per-rule pass rate and a latency summary (mean / p50 / p95). Use this when you add a rule or change a prompt.
+Runs every fixture in `evals/fixtures/ww-before-after.json`. Prints per-rule pass rate and a latency summary (mean / p50 / p95). Use this when you add a rule, change a prompt, or want a head-to-head comparison between providers.
 
 ## Deploy to Vercel
 
 1. Push to GitHub.
 2. Import the repo in Vercel.
-3. Set `ANTHROPIC_API_KEY` under Project → Settings → Environment Variables.
+3. Set `ANTHROPIC_API_KEY` (and `INCEPTION_API_KEY` if you want the Mercury toggle to work) under Project → Settings → Environment Variables.
 4. Deploy.
 
 The API routes are server-only — the key never reaches the browser.

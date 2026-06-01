@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { ParagraphFeedback } from "@/lib/analyze/tools";
-import { getProvider } from "@/lib/analyze/providers";
+import { getProvider, type ProviderId } from "@/lib/analyze/providers";
 
 export const runtime = "nodejs";
 export const maxDuration = 30;
@@ -8,6 +8,7 @@ export const maxDuration = 30;
 type RequestBody = {
   focusParagraph: string;
   documentBody?: string;
+  provider?: ProviderId;
 };
 
 export async function POST(req: NextRequest) {
@@ -17,11 +18,11 @@ export async function POST(req: NextRequest) {
       issues: [],
       improvements: [],
       praises: [],
-      meta: { provider: "anthropic", modelName: "skipped", latencyMs: 0 },
+      meta: { provider: body.provider ?? "anthropic", modelName: "skipped", latencyMs: 0 },
     } satisfies ParagraphFeedback & { meta: unknown });
   }
 
-  const provider = getProvider();
+  const provider = getProvider(body.provider);
   try {
     const { feedback, meta } = await provider.analyzeParagraph({
       focusParagraph: body.focusParagraph,
